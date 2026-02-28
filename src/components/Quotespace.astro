@@ -1,0 +1,49 @@
+---
+import { Image } from "astro:assets";
+const imageSrc = Astro.props.src;
+const imageAlt = Astro.props.alt;
+const url = Astro.props.url || "#";
+const urlText = Astro.props.urlText || "Voir tous les conseils";
+
+---
+
+<blockquote class=" flex gap-15 mt-16">
+    <cite class="flex-1 aspect-square overflow-hidden">
+        <span>
+            <Image src={imageSrc} alt={imageAlt} />
+        </span>
+    </cite>
+    <div class="flex-1 pt-16">
+        <div><span class="quote judson-regular text-5xl relative">L'autisme en Afrique est un enjeu de santé publique majeur, marqué par une forte stigmatisation, un manque de diagnostics précoces et de structures spécialisées.</span></div>
+        <div>
+            <h2 class="text-2xl font-bold judson-bold mt-9">Dr. Jane Doe</h2>
+            <p class="text-sm text-gray-700">
+                Psychologue spécialisée dans l'autisme
+            </p>
+            <a href={url} class="flex gap-4 items-center hover:underline mt-4 text-lg font-bold text-gray-700">
+            <div class="flex items-center justify-center w-9 h-9 rounded-full bg-gray-600 hover:bg-gray-900 text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><!-- Icon from Remix Icon by Remix Design - https://github.com/Remix-Design/RemixIcon/blob/master/License --><path fill="currentColor" d="m16.172 11l-5.364-5.364l1.414-1.414L20 12l-7.778 7.778l-1.414-1.414L16.172 13H4v-2z"/></svg>
+            </div>
+            {urlText}
+        </a>
+        </div>
+    </div>
+    
+</blockquote>
+
+
+<style>
+    .quote::before {
+        background-image: url(/quote-small-crimson.svg);
+        content: "";
+        width: 5rem;
+        height: 5rem;
+        background-size: contain;
+        background-repeat: no-repeat;
+        color: rgba(0, 0, 0, 0.1);
+        position: absolute;
+        top: -2rem;
+        left: -2rem;
+        z-index: -1;
+    }
+</style>

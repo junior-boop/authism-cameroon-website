@@ -125,7 +125,7 @@ h4,
 h5,
 h6 {
 	color: rgb(var(--black));
-	line-height: 1.2;
+	line-height: 1;
 }
 /* h1 {
 	font-size: 3.052em;
