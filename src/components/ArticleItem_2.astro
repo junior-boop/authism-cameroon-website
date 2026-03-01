@@ -1,0 +1,81 @@
+---
+import { Image } from "astro:assets";
+import imageTemplate from "../assets/blog-placeholder-3.jpg";
+
+interface Props {
+    title?: string;
+    subtitle?: string;
+    imageSrc?: string;
+    imageAlt?: string;
+    url?: string;
+    urlTitle?: string;
+}
+
+const title =
+    Astro.props.title ||
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit";
+const subtitle =
+    Astro.props.subtitle ||
+    "Nulla commodo interdum tincidunt. Donec elementum massa et ligul vari";
+const subtitle_substring =
+    subtitle.length > 68 ? subtitle.substring(0, 69) + "..." : subtitle;
+
+const imageSrc = Astro.props.imageSrc || imageTemplate;
+const imageAlt = Astro.props.imageAlt || "images";
+
+const url = Astro.props.url || "/";
+const urlTitle = Astro.props.urlTitle || "Voir l'article";
+---
+
+<div class='flex flex-col aspect-2/3 gap-3 items-start bg-gray-100'>
+    <a class='images' href={url}>
+        <Image src={imageSrc as string} alt={imageAlt} />
+    </a>
+    <div class='px-6 pb-6'>
+        <a
+            href={url}
+            class='flex flex-col mt-4 justify-between w-full h-[250px]'>
+            <span class='flex flex-col gap-4'>
+                <span class='hover:underline judson-bold text-3xl line-height'
+                    >{title}</span
+                >
+                <span class='text-lg line-height'>{subtitle_substring}</span>
+            </span>
+
+            <span
+                class='flex gap-4 items-center hover:underline mt-4 text-lg font-bold text-gray-700'>
+                <div
+                    class='flex items-center justify-center w-9 h-9 rounded-full bg-gray-600 hover:bg-gray-900 text-white'>
+                    <svg
+                        xmlns='http://www.w3.org/2000/svg'
+                        width='24'
+                        height='24'
+                        viewBox='0 0 24 24'
+                        ><!-- Icon from Remix Icon by Remix Design - https://github.com/Remix-Design/RemixIcon/blob/master/License -->
+                        <path
+                            fill='currentColor'
+                            d='m16.172 11l-5.364-5.364l1.414-1.414L20 12l-7.778 7.778l-1.414-1.414L16.172 13H4v-2z'
+                        ></path></svg
+                    >
+                </div>
+                {urlTitle}
+            </span>
+        </a>
+    </div>
+</div>
+
+<style>
+    .line-height {
+        line-height: 1.1;
+    }
+    .images {
+        width: 100%;
+        aspect-ratio: 4/3;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+</style>

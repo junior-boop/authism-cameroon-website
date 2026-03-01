@@ -1,50 +1,98 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import BaseHead from "../components/BaseHead.astro";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import HeroSection from "../components/HeroSection.astro";
+import Container from "../components/Container.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
+import Title from "../components/Title.astro";
+import ExpertView from "../components/ExpertView.astro";
+import export_1 from "../assets/expert_1.jpg";
+import export_2 from "../assets/expert_2.jpg";
+import export_3 from "../assets/expert_3.jpg";
+import Dote from "../components/Dote.astro";
+import Quotespace from "../components/Quotespace.astro";
+import ArticlesItems from "../components/ArticlesItems.astro";
+import ArticleItem from "../components/ArticleItem_2.astro";
+import EventItem from "../components/EventItem_1.astro";
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang='en'>
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
 		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to build
-				a personal website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to <a href="https://docs.astro.build/"
-					>read the docs
-				</a> or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out <a
-					href="https://github.com/Charca/astro-blog-template"
-					>astro-blog-template
-				</a> by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
+		<HeroSection />
+		<section>
+			<Container>
+				<Title
+					title='Comment les experts en parlent'
+					subtitle="Découvrez les perspectives de professionnels spécialisés dans l'autisme."
+				/>
+				<div class='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+					<ExpertView src={export_1} alt='Expert 1' />
+					<ExpertView src={export_2} alt='Expert 2' />
+					<ExpertView src={export_3} alt='Expert 3' />
+				</div>
+				<Dote />
+				<Title
+					title='Dans la vie de tous les jours'
+					subtitle='Découvrez comment apporter des solutions adaptées aux besoins des personnes autistes.'
+					readmore={true}
+					url='/expert-views'
+					urlText='Voir tous les conseils'
+				/>
+				<Quotespace
+					src={export_1}
+					alt='Expert 1'
+					url='/expert-views'
+					urlText="Lire tout l'article pour apprendre plus"
+				/>
+				<div class='grid grid-cols-2 gap-15 mt-20 mb-40'>
+					<ArticlesItems
+						title='Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+					/>
+					<ArticlesItems
+						title='Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+					/>
+					<ArticlesItems
+						title='Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+					/>
+					<ArticlesItems
+						title='Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+					/>
+				</div>
+				<Title
+					title='Le vécu des personnes autistes et autres'
+					subtitle='Découvrez comment apporter des solutions adaptées aux besoins des personnes autistes.'
+					readmore={true}
+					url='/expert-views'
+					urlText='Voir tous les conseils'
+				/>
+				<Quotespace
+					src={export_1}
+					alt='Expert 1'
+					url='/expert-views'
+					urlText="Lire tout l'article pour apprendre plus"
+				/>
+				<div class='grid grid-cols-3 gap-15 mt-20 mb-40'>
+					<ArticleItem
+						title='Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+					/>
+					<EventItem
+						title='Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+					/>
+					<ArticlesItems
+						title='Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+					/>
+					<ArticlesItems
+						title='Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+					/>
+				</div>
+			</Container>
+		</section>
 		<Footer />
 	</body>
 </html>

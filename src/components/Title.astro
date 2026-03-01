@@ -1,0 +1,32 @@
+---
+type props = {
+    title?: string;
+    subtitle?: string;
+    readmore?: boolean;
+    url?: string;
+    urlText?: string;
+}
+
+const titre = Astro.props.title || "Ce qu'en pensent les experts";
+const subtitle = Astro.props.subtitle || "Découvrez les perspectives de professionnels spécialisés dans l'autisme.";
+const readmoreactive = Astro.props.readmore || false;
+const url = readmoreactive ? Astro.props.url : "#";
+const urlText = readmoreactive ? Astro.props.urlText : "Lire plus";
+---
+
+<div class={`mt-28 flex items-start justify-between mb-5 ${readmoreactive ? "border-b-5 border-gray-900 pb-7" : ''}`}>
+    <div class="w-[35%]">
+        <h1 class="text-5xl font-bold mb-4 judson-bold">{titre}</h1>
+    </div>
+    <div class="w-[50%]">
+        <p class="text-xl text-gray-600  mt-2">{subtitle}</p>
+        {
+            readmoreactive && (<a href={url} class="flex gap-4 items-center hover:underline mt-4 text-lg font-bold text-gray-700">
+            <div class="flex items-center justify-center w-9 h-9 rounded-full bg-gray-600 hover:bg-gray-900 text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><!-- Icon from Remix Icon by Remix Design - https://github.com/Remix-Design/RemixIcon/blob/master/License --><path fill="currentColor" d="m16.172 11l-5.364-5.364l1.414-1.414L20 12l-7.778 7.778l-1.414-1.414L16.172 13H4v-2z"/></svg>
+            </div>
+            {urlText}
+        </a>)
+        }
+    </div>
+</div>

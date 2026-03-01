@@ -1,0 +1,94 @@
+---
+import { Image } from "astro:assets";
+import imageTemplate from "../assets/blog-placeholder-3.jpg";
+
+interface Props {
+    title?: string;
+    subtitle?: string;
+    imageSrc?: string;
+    imageAlt?: string;
+    url?: string;
+    date?: string;
+}
+
+const date = Astro.props.date || "12 Mars, 2026";
+const title =
+    Astro.props.title ||
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit";
+const subtitle =
+    Astro.props.subtitle ||
+    "Nulla commodo interdum tincidunt. Donec elementum massa et ligul vari";
+const subtitle_substring =
+    subtitle.length > 68 ? subtitle.substring(0, 69) + "..." : subtitle;
+
+const imageSrc = Astro.props.imageSrc || imageTemplate;
+const imageAlt = Astro.props.imageAlt || "images";
+
+const url = Astro.props.url || "/";
+const urlTitle = "lire plus";
+---
+
+<div class='flex flex-col gap-4 items-start bg-gray-100 h-[560px]'>
+    <div class='flex justify-between px-6 pt-6'>
+        <a href={url} class='flex flex-col w-[60%]'>
+            <span class='hover:underline font-black text-lg line-height'
+                >{date}</span
+            >
+            <span class='text-lg line-height text-gray-700 mt-2'
+                >de 14h30 - 18h</span
+            >
+            <span class='text-lg line-height mt-2'
+                >Centre Culturel Francais de Douala</span
+            >
+        </a>
+        <a class='images' href={url}>
+            <Image src={imageSrc as string} alt={imageAlt} />
+        </a>
+    </div>
+    <div class='px-6 pb-6 flex-1'>
+        <a href={url} class='flex flex-col justify-between w-full h-[376px]'>
+            <span class='flex flex-col gap-4'>
+                <span class='hover:underline judson-bold text-3xl line-height'
+                    >{title}</span
+                >
+                <span class='text-lg line-height'>{subtitle_substring}</span>
+            </span>
+
+            <span
+                class='flex gap-4 items-center hover:underline mt-4 text-lg font-bold text-gray-700'>
+                <div
+                    class='flex items-center justify-center w-9 h-9 rounded-full bg-gray-600 hover:bg-gray-900 text-white'>
+                    <svg
+                        xmlns='http://www.w3.org/2000/svg'
+                        width='24'
+                        height='24'
+                        viewBox='0 0 24 24'
+                        ><!-- Icon from Remix Icon by Remix Design - https://github.com/Remix-Design/RemixIcon/blob/master/License -->
+                        <path
+                            fill='currentColor'
+                            d='m16.172 11l-5.364-5.364l1.414-1.414L20 12l-7.778 7.778l-1.414-1.414L16.172 13H4v-2z'
+                        ></path></svg
+                    >
+                </div>
+                {urlTitle}
+            </span>
+        </a>
+    </div>
+</div>
+
+<style>
+    .line-height {
+        line-height: 1.1;
+    }
+    .images {
+        width: 30%;
+        aspect-ratio: 3/4;
+        border: 1px solid #ccc;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+</style>

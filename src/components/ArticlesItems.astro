@@ -1,0 +1,55 @@
+---
+import { Image } from "astro:assets";
+import imageTemplate from "../assets/blog-placeholder-3.jpg";
+
+interface Props {
+    title?: string;
+    subtitle?: string;
+    imageSrc?: string;
+    imageAlt?: string;
+    url?: string;
+}
+
+const title =
+    Astro.props.title ||
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit";
+const subtitle =
+    Astro.props.subtitle ||
+    "Nulla commodo interdum tincidunt. Donec elementum massa et ligul vari";
+const subtitle_substring =
+    subtitle.length > 68 ? subtitle.substring(0, 69) + "..." : subtitle;
+
+const imageSrc = Astro.props.imageSrc || imageTemplate;
+const imageAlt = Astro.props.imageAlt || "images";
+
+const url = Astro.props.url || "/";
+---
+
+<div class='flex justify-between gap-4 items-start'>
+    <a href={url} class='flex flex-col mt-4 gap-4 w-[60%]'>
+        <span class='hover:underline judson-bold text-3xl line-height'
+            >{title}</span
+        >
+        <span class='text-lg line-height'>{subtitle_substring}</span>
+    </a>
+    <a class='images' href={url}>
+        <Image src={imageSrc as string} alt={imageAlt} />
+    </a>
+</div>
+
+<style>
+    .line-height {
+        line-height: 1.1;
+    }
+    .images {
+        width: 30%;
+        aspect-ratio: 1;
+        border: 1px solid #ccc;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+</style>
