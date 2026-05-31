@@ -1,0 +1,10 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import AdminExperts from "../../components/admin/AdminExperts";
+
+const token = Astro.cookies.get("admin_token")?.value ?? "";
+---
+
+<AdminLayout title="Conseils des Pros" active="experts">
+  <AdminExperts token={token} client:load />
+</AdminLayout>

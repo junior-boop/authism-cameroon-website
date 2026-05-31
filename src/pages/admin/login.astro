@@ -1,0 +1,68 @@
+---
+import "../../styles/global.css";
+
+const ADMIN_PASSWORD = "admin1234";
+
+if (Astro.request.method === "POST") {
+  const form = await Astro.request.formData();
+  const password = form.get("password") as string;
+
+  if (password && password === ADMIN_PASSWORD) {
+    Astro.cookies.set("admin_token", password, {
+      path: "/",
+      httpOnly: false,
+      maxAge: 60 * 60 * 8,
+      sameSite: "lax",
+    });
+    return Astro.redirect("/admin");
+  }
+}
+
+const error =
+  Astro.request.method === "POST" ? "Mot de passe incorrect." : null;
+---
+
+<!doctype html>
+<html lang='fr'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width' />
+    <title>Connexion Admin — Mangwa</title>
+  </head>
+  <body class='bg-gray-950 min-h-screen flex items-center justify-center'>
+    <div
+      class='w-full max-w-sm bg-gray-900 rounded-xl p-8 shadow-2xl w-[40%] mx-auto'>
+      <p
+        class='text-[#00bcd4] font-bold text-sm uppercase tracking-widest mb-1'>
+        Mangwa Corpus
+      </p>
+      <h1 class='text-white text-2xl font-extrabold mb-6'>Administration</h1>
+
+      {
+        error && (
+          <div class='bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded px-4 py-3 mb-4'>
+            {error}
+          </div>
+        )
+      }
+
+      <form method='POST' class='flex flex-col gap-4'>
+        <div>
+          <label class='block text-gray-400 text-sm mb-1.5'>Mot de passe</label>
+          <input
+            type='password'
+            name='password'
+            autofocus
+            required
+            class='w-full bg-gray-800 border border-gray-700 text-white rounded px-4 py-2.5 text-sm focus:outline-none focus:border-[#00bcd4]'
+          />
+        </div>
+        <button
+          type='submit'
+          class='bg-[#00bcd4] hover:bg-[#00acc1] transition-colors text-white font-bold py-2.5 rounded text-sm'>
+          Se connecter
+        </button>
+      </form>
+    </div>
+  </body>
+</html>

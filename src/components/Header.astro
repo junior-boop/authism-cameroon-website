@@ -1,28 +1,41 @@
 ---
-import { Image } from 'astro:assets';
-import { SITE_TITLE } from '../consts';
-import HeaderLink from './HeaderLink.astro';
-import images  from "../assets/regard_autist.png";
+import { Image } from "astro:assets";
+import { SITE_TITLE } from "../consts";
+import HeaderLink from "./HeaderLink.astro";
+import images from "../assets/regard_autist.png";
 ---
 
 <header>
 	<nav>
 		<div>
-			<Image src={images} alt={SITE_TITLE} height={48}   />
-		</div>
-		<div class="internal-links">
-			<HeaderLink href="/">Notre Mission</HeaderLink>
-			<HeaderLink href="/blog">Actualités</HeaderLink>
-			<HeaderLink href="/about">Évenements</HeaderLink>
-			<HeaderLink href="/about">A Propos</HeaderLink>
-			<a class="px-4 py-2 flex gap-2 items-center border border-[#FF5656] rounded-4xl bg-[#FF5656] text-white" href="mailto:contact@regard-autist.fr">
-				<span >
-					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><!-- Icon from Remix Icon by Remix Design - https://github.com/Remix-Design/RemixIcon/blob/master/License --><path fill="currentColor" d="M6.455 19L2 22.5V4a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1z"/></svg>
-				</span>
-				<span class="font-bold">Contactez-nous</span>
+			<a href='/' class='flex items-center gap-2'>
+				<Image src={images} alt={SITE_TITLE} height={48} />
 			</a>
 		</div>
-		
+		<div class='internal-links'>
+			<HeaderLink href='/about'>Notre Mission</HeaderLink>
+			<HeaderLink href='/associations'>Associations</HeaderLink>
+			<HeaderLink href='/blog'>Actualités</HeaderLink>
+			<HeaderLink href='/events'>Évenements</HeaderLink>
+			<a
+				class='px-4 py-2 flex gap-2 items-center border border-[#FF5656] rounded-4xl bg-[#FF5656] text-white'
+				href='mailto:contact@regard-autist.fr'>
+				<span>
+					<svg
+						xmlns='http://www.w3.org/2000/svg'
+						width='20'
+						height='20'
+						viewBox='0 0 24 24'
+						><!-- Icon from Remix Icon by Remix Design - https://github.com/Remix-Design/RemixIcon/blob/master/License -->
+						<path
+							fill='currentColor'
+							d='M6.455 19L2 22.5V4a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1z'
+						></path></svg
+					>
+				</span>
+				<span class='font-bold'>Contactez-nous</span>
+			</a>
+		</div>
 	</nav>
 </header>
 <style>
@@ -32,14 +45,14 @@ import images  from "../assets/regard_autist.png";
 		background: white;
 		/* box-shadow: 0 2px 8px rgba(var(--black), 5%); */
 	}
-	
+
 	nav {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		padding: 1em 1em;
 
-		&>div {
+		& > div {
 			flex: 1;
 			display: flex;
 			align-items: center;
@@ -57,7 +70,6 @@ import images  from "../assets/regard_autist.png";
 	}
 	nav a.active {
 		text-decoration: none;
-
 	}
 	.social-links,
 	.social-links a {

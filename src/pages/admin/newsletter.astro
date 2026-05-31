@@ -1,0 +1,10 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import AdminNewsletter from "../../components/admin/AdminNewsletter";
+
+const token = Astro.cookies.get("admin_token")?.value ?? "";
+---
+
+<AdminLayout title="Newsletter" active="newsletter">
+  <AdminNewsletter token={token} client:load />
+</AdminLayout>

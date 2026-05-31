@@ -1,0 +1,10 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import AdminContacts from "../../components/admin/AdminContacts";
+
+const token = Astro.cookies.get("admin_token")?.value ?? "";
+---
+
+<AdminLayout title="Messages reçus" active="contacts">
+  <AdminContacts token={token} client:load />
+</AdminLayout>

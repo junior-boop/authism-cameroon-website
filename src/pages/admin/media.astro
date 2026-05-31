@@ -1,0 +1,10 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import AdminMedia from "../../components/admin/AdminMedia";
+
+const token = Astro.cookies.get("admin_token")?.value ?? "";
+---
+
+<AdminLayout title="Médiathèque" active="media">
+  <AdminMedia token={token} client:load />
+</AdminLayout>

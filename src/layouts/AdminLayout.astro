@@ -1,0 +1,107 @@
+---
+import "../styles/global.css";
+import logo from "../assets/logo.png";
+interface Props {
+  title?: string;
+  active?: string;
+}
+
+const { title = "Administration", active = "" } = Astro.props;
+
+const nav = [
+  { href: "/admin", label: "Tableau de bord", key: "dashboard" },
+  { href: "/admin/news", label: "Actualités", key: "news" },
+  { href: "/admin/events", label: "Événements", key: "events" },
+  { href: "/admin/experts", label: "Conseils des Pros", key: "experts" },
+  { href: "/admin/associations", label: "Associations", key: "associations" },
+  { href: "/admin/gallery", label: "Galerie", key: "gallery" },
+  { href: "/admin/contacts", label: "Messages", key: "contacts" },
+  { href: "/admin/hero", label: "Bannières", key: "hero" },
+  { href: "/admin/big-hero", label: "Big Hero", key: "big-hero" },
+  { href: "/admin/media", label: "Médias", key: "media" },
+  { href: "/admin/users", label: "Utilisateurs", key: "users" },
+  { href: "/admin/newsletter", label: "Newsletter", key: "newsletter" },
+];
+---
+
+<!doctype html>
+<html lang='fr'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width' />
+    <link rel='icon' type='image/svg+xml' href={logo.src} />
+    <link rel='icon' href={logo.src} />
+    <link rel='apple-touch-icon' href={logo.src} />
+    <meta name='generator' content={Astro.generator} />
+
+    <title>{title} — Authism Cameroon Admin</title>
+  </head>
+  <body class='bg-gray-100 h-screen flex overflow-hidden'>
+    <div
+      id='page-loader'
+      style='display:flex'
+      class='fixed inset-0 z-9999 bg-white flex-col items-center justify-center'>
+      <p
+        class='text-[#00bcd4] font-bold text-xs uppercase tracking-widest mb-5'>
+        Authism Cameroon
+      </p>
+      <div
+        class='w-6 h-6 border-2 border-gray-200 border-t-[#00bcd4] rounded-full animate-spin'>
+      </div>
+    </div>
+    <script>
+      const el = document.getElementById("page-loader") as HTMLElement | null;
+      function hide() {
+        if (!el) return;
+        el.style.transition = "opacity 0.35s ease";
+        el.style.opacity = "0";
+        el.style.pointerEvents = "none";
+        setTimeout(() => {
+          if (el) el.style.display = "none";
+        }, 350);
+      }
+      window.addEventListener("load", () => setTimeout(hide, 100), {
+        once: true,
+      });
+      setTimeout(hide, 5000);
+    </script>
+    <!-- Sidebar -->
+    <aside
+      class='w-60 bg-gray-900 text-white flex flex-col shrink-0 h-full overflow-y-auto'>
+      <div class='px-6 py-5 border-b border-gray-700'>
+        <p class='font-bold text-sm uppercase tracking-widest text-[#00bcd4]'>
+          Authism Cameroon
+        </p>
+        <p class='text-xs text-gray-400 mt-0.5'>Administration</p>
+      </div>
+      <nav class='flex flex-col py-4 gap-1 flex-1'>
+        {
+          nav.map((item) => (
+            <a
+              href={item.href}
+              class={`px-6 py-2.5 text-sm font-medium transition-colors ${
+                active === item.key
+                  ? "bg-[#00bcd4] text-white"
+                  : "text-gray-300 hover:bg-gray-800 hover:text-white"
+              }`}>
+              {item.label}
+            </a>
+          ))
+        }
+      </nav>
+      <div class='px-6 py-4 border-t border-gray-700'>
+        <a
+          href='/'
+          class='text-base text-gray-500 hover:text-gray-300 transition-colors flex items-center gap-2'>
+          ← Retour au site
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class='flex-1 p-8 overflow-auto'>
+      <h1 class='text-2xl font-extrabold text-gray-900 mb-6'>{title}</h1>
+      <slot />
+    </main>
+  </body>
+</html>

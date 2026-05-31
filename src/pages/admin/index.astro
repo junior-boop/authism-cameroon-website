@@ -1,0 +1,16 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import AdminActivity from "../../components/admin/AdminActivity";
+import AdminDashboardCards from "../../components/admin/AdminDashboardCards";
+
+const token = Astro.cookies.get("admin_token")?.value ?? "";
+---
+
+<AdminLayout title='Tableau de bord' active='dashboard'>
+  <AdminDashboardCards token={token} client:load />
+
+  <div>
+    <h2 class='text-base font-bold text-gray-900 mb-4'>Activité récente</h2>
+    <AdminActivity token={token} client:load />
+  </div>
+</AdminLayout>

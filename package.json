@@ -4,9 +4,13 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "dev:all": "concurrently -n \"front,serveur\" -c \"cyan,magenta\" \"astro dev\" \"cd serveur && npm run dev\"",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",

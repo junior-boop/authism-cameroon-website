@@ -1,0 +1,10 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import AdminEvents from "../../components/admin/AdminEvents";
+
+const token = Astro.cookies.get("admin_token")?.value ?? "";
+---
+
+<AdminLayout title="Événements" active="events">
+  <AdminEvents token={token} client:load />
+</AdminLayout>
