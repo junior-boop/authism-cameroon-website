@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { adminApi } from "../../lib/api";
+import { api, adminApi } from "../../lib/api";
 
 type Counts = {
   news: number;
@@ -32,12 +32,12 @@ export default function AdminDashboardCards({ token }: { token: string }) {
   useEffect(() => {
     const a = adminApi(token);
     Promise.allSettled([
-      fetch(`/api/news/all`).then((r) => r.json()).then((d: any[]) => ({ news: d.length })),
-      fetch(`/api/events/all`).then((r) => r.json()).then((d: any[]) => ({ events: d.length })),
-      fetch(`/api/experts/all`).then((r) => r.json()).then((d: any[]) => ({ experts: d.length })),
-      fetch(`/api/associations`).then((r) => r.json()).then((d: any[]) => ({ associations: d.length })),
-      fetch(`/api/gallery`).then((r) => r.json()).then((d: any[]) => ({ gallery: d.length })),
-      fetch(`/api/media`).then((r) => r.json()).then((d: any[]) => ({ media: d.length })),
+      api.news().then((d) => ({ news: d.length })),
+      api.events().then((d) => ({ events: d.length })),
+      api.experts().then((d) => ({ experts: d.length })),
+      api.associations().then((d) => ({ associations: d.length })),
+      api.gallery().then((d) => ({ gallery: d.length })),
+      api.media().then((d) => ({ media: d.length })),
       a.contacts.list().then((d) => ({ contacts: d.length })),
       a.users.list().then((d) => ({ users: d.length })),
       a.newsletter.list().then((d) => ({ newsletter: d.length })),

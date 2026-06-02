@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 import { api, adminApi, mediaUrl, type Association } from "../../lib/api";
 import MediaField from "./MediaField";
+import SlugField from "./SlugField";
+import RichTextEditor from "./RichTextEditor";
+import AlbumField from "./AlbumField";
 
 export default function AdminAssociations({ token }: { token: string }) {
   const [items, setItems] = useState<Association[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ open: boolean; item?: Association }>({ open: false });
+  const [contentModal, setContentModal] = useState<{ open: boolean; item?: Association }>({ open: false });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,6 +35,28 @@ export default function AdminAssociations({ token }: { token: string }) {
       }
       await reload();
       setModal({ open: false });
+    } catch {
+      setError("Erreur réseau");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleSaveContent(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!contentModal.item) return;
+    setSaving(true);
+    setError(null);
+    const form = new FormData(e.currentTarget);
+    try {
+      const res = await adminApi(token).associations.updateContent(contentModal.item.id, form);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as any;
+        setError(body?.error ?? `Erreur serveur ${res.status}`);
+        return;
+      }
+      await reload();
+      setContentModal({ open: false });
     } catch {
       setError("Erreur réseau");
     } finally {
@@ -95,6 +121,7 @@ export default function AdminAssociations({ token }: { token: string }) {
                     )}
                   </td>
                   <td className="px-4 py-3 text-right space-x-2">
+                    <button onClick={() => setContentModal({ open: true, item })} className="text-purple-600 hover:text-purple-800 font-medium text-xs">Description</button>
                     <button onClick={() => setModal({ open: true, item })} className="text-blue-600 hover:text-blue-800 font-medium text-xs">Modifier</button>
                     <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:text-red-700 font-medium text-xs">Supprimer</button>
                   </td>
@@ -117,8 +144,7 @@ export default function AdminAssociations({ token }: { token: string }) {
             </div>
             <form onSubmit={handleSave} className="p-6 flex flex-col gap-4">
               <Field label="Nom *" name="name" required defaultValue={modal.item?.name} />
-              <Field label="Slug" name="slug" defaultValue={modal.item?.slug ?? ""} />
-              <Field label="Description" name="description" textarea rows={5} defaultValue={modal.item?.description ?? ""} />
+              <SlugField sourceName="name" defaultValue={modal.item?.slug ?? ""} />
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Email" name="email" type="email" defaultValue={modal.item?.email ?? ""} />
                 <Field label="Téléphone" name="phone" defaultValue={modal.item?.phone ?? ""} />
@@ -134,9 +160,47 @@ export default function AdminAssociations({ token }: { token: string }) {
               </label>
               <hr className="border-gray-100" />
               <MediaField label="Logo" name="logo" token={token} currentKey={modal.item?.logo} defaultFolder="associations" />
+              {!modal.item && (
+                <p className="text-xs text-gray-500 -mt-1">
+                  La description et l'album photo pourront être ajoutés après l'enregistrement, via le bouton « Description ».
+                </p>
+              )}
               {error && <p className="text-red-600 text-sm">{error}</p>}
               <div className="flex gap-3 justify-end pt-2">
                 <button type="button" onClick={() => setModal({ open: false })} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">Annuler</button>
+                <button type="submit" disabled={saving} className="bg-[#00bcd4] hover:bg-[#00acc1] text-white font-bold px-6 py-2 rounded text-sm disabled:opacity-60">
+                  {saving ? "Enregistrement…" : "Enregistrer"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {contentModal.open && contentModal.item && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b">
+              <h2 className="font-bold text-gray-900">Description — {contentModal.item.name}</h2>
+              <button onClick={() => setContentModal({ open: false })} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+            </div>
+            <form onSubmit={handleSaveContent} className="p-6 flex flex-col gap-6">
+              <RichTextEditor
+                name="description"
+                label="Description"
+                defaultValue={contentModal.item.description ?? ""}
+                token={token}
+                defaultFolder="associations"
+              />
+              <AlbumField
+                name="album"
+                token={token}
+                defaultValue={contentModal.item.album}
+                defaultFolder="associations"
+              />
+              {error && <p className="text-red-600 text-sm">{error}</p>}
+              <div className="flex gap-3 justify-end border-t border-gray-100 -mx-6 px-6 pt-4">
+                <button type="button" onClick={() => setContentModal({ open: false })} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">Annuler</button>
                 <button type="submit" disabled={saving} className="bg-[#00bcd4] hover:bg-[#00acc1] text-white font-bold px-6 py-2 rounded text-sm disabled:opacity-60">
                   {saving ? "Enregistrement…" : "Enregistrer"}
                 </button>

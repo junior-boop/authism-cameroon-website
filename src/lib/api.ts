@@ -1,4 +1,22 @@
-const API_BASE = '/api'
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:8788'
+
+export function slugify(input: string | null | undefined): string {
+  if (!input) return ''
+  return input
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-{2,}/g, '-')
+}
+
+export function mediaUrl(key: string | null | undefined): string | null {
+  if (!key) return null
+  return `${API_URL}/api/media/${key}`
+}
 
 export type HeroSection = {
   id: string
@@ -16,25 +34,6 @@ export type HeroSection = {
   updated_at: string
 }
 
-export type MediaFile = {
-  id: string
-  key: string
-  filename: string
-  content_type: string
-  size: number
-  folder: string
-  media_type: string | null
-  created_at: string
-}
-
-export type Newsletter = {
-  id: string
-  email: string
-  name: string | null
-  active: number
-  subscribed_at: string
-}
-
 export type BigHeroSlide = {
   id: string
   title: string
@@ -46,6 +45,17 @@ export type BigHeroSlide = {
   active: number
   created_at: string
   updated_at: string
+}
+
+export type MediaFile = {
+  id: string
+  key: string
+  filename: string
+  content_type: string | null
+  size: number | null
+  folder: string | null
+  media_type: string | null
+  created_at: string
 }
 
 export type News = {
@@ -103,6 +113,7 @@ export type Association = {
   name: string
   slug: string | null
   description: string | null
+  album: string | null
   logo: string | null
   website: string | null
   email: string | null
@@ -114,24 +125,35 @@ export type Association = {
   updated_at: string
 }
 
-export type Expert = {
+export type Advisor = {
   id: string
   name: string
-  slug: string | null
-  specialty: string | null
-  photo: string | null
-  bio: string | null
-  city: string | null
   email: string | null
   phone: string | null
+  facebook: string | null
+  twitter: string | null
+  photo: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type Expert = {
+  id: string
+  advisor_id: string | null
+  slug: string | null
   advice_title: string | null
   advice_content: string | null
-  category: string | null
   featured: number
   published: number
   published_at: string | null
   created_at: string
   updated_at: string
+  advisor?: Advisor | null
+  // Champs aplatis renvoyés par l'API publique (issus du conseiller lié)
+  name?: string | null
+  photo?: string | null
+  email?: string | null
+  phone?: string | null
 }
 
 export type User = {
@@ -141,92 +163,188 @@ export type User = {
   role: string
   active: number
   created_at: string
-  updated_at: string
+}
+
+export type NewsletterSubscriber = {
+  id: string
+  email: string
+  name: string | null
+  active: number
+  subscribed_at: string
 }
 
 export type ActivityEntry = {
   id: string
-  action: string
-  entity_type: string
+  action: 'create' | 'update' | 'delete'
+  entity_type: 'news' | 'event' | 'association' | 'expert' | 'gallery' | 'contact' | 'media' | 'hero' | 'big-hero'
   entity_id: string | null
   entity_name: string | null
   entity_image: string | null
   created_at: string
 }
 
-async function get<T>(url: string): Promise<T> {
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`GET ${url} failed: ${res.status}`)
-  return res.json()
-}
-
 export const api = {
-  hero:         () => get<HeroSection[]>(`${API_BASE}/hero`),
-  media:        () => get<MediaFile[]>(`${API_BASE}/media`),
-  bigHero:      () => get<BigHeroSlide[]>(`${API_BASE}/big-hero`),
-  news:         () => get<News[]>(`${API_BASE}/news/all`),
-  gallery:      () => get<GalleryItem[]>(`${API_BASE}/gallery`),
-  events:       () => get<Event[]>(`${API_BASE}/events/all`),
-  contacts:     () => get<ContactMessage[]>(`${API_BASE}/contacts`),
-  associations: () => get<Association[]>(`${API_BASE}/associations`),
-  experts:      () => get<Expert[]>(`${API_BASE}/experts/all`),
-}
-
-export function mediaUrl(key: string | null | undefined): string | null {
-  if (!key) return null
-  return `${API_BASE}/media/${key}`
-}
-
-async function uploadForm(url: string, form: FormData, onProgress?: (pct: number) => void): Promise<Response> {
-  if (onProgress) onProgress(50)
-  const res = await fetch(url, { method: 'POST', body: form })
-  if (onProgress) onProgress(100)
-  return res
+  hero: (page?: string): Promise<HeroSection[]> =>
+    fetch(`${API_URL}/api/hero${page ? `?page=${encodeURIComponent(page)}` : ''}`).then((r) => r.json()),
+  bigHero: (): Promise<BigHeroSlide[]> =>
+    fetch(`${API_URL}/api/big-hero`).then((r) => r.json()),
+  media: (): Promise<MediaFile[]> =>
+    fetch(`${API_URL}/api/media`).then((r) => r.json()),
+  news: (): Promise<News[]> =>
+    fetch(`${API_URL}/api/news/all`).then((r) => r.json()),
+  newsOne: (id: string): Promise<News> =>
+    fetch(`${API_URL}/api/news/${id}`).then((r) => r.json()),
+  gallery: (): Promise<GalleryItem[]> =>
+    fetch(`${API_URL}/api/gallery`).then((r) => r.json()),
+  events: (): Promise<Event[]> =>
+    fetch(`${API_URL}/api/events/all`).then((r) => r.json()),
+  eventOne: (id: string): Promise<Event> =>
+    fetch(`${API_URL}/api/events/${id}`).then((r) => r.json()),
+  associations: (): Promise<Association[]> =>
+    fetch(`${API_URL}/api/associations`).then((r) => r.json()),
+  associationOne: (id: string): Promise<Association> =>
+    fetch(`${API_URL}/api/associations/${id}`).then((r) => r.json()),
+  experts: (): Promise<Expert[]> =>
+    fetch(`${API_URL}/api/experts/all`).then((r) => r.json()),
+  expertOne: (id: string): Promise<Expert> =>
+    fetch(`${API_URL}/api/experts/${id}`).then((r) => r.json()),
 }
 
 export function adminApi(token: string) {
-  const headers = { Authorization: `Bearer ${token}` }
+  const auth = { Authorization: `Bearer ${token}` }
 
-  function crud(base: string) {
-    return {
-      create: (form: FormData) => uploadForm(base, form),
-      update: (id: string, form: FormData) => fetch(`${base}/${id}`, { method: 'PUT', body: form, headers }),
-      delete: (id: string) => fetch(`${base}/${id}`, { method: 'DELETE', headers }),
-    }
-  }
-
-  const mediaApi = {
-    upload: (form: FormData, onProgress?: (pct: number) => void) => uploadForm('/admin/media', form, onProgress),
-    delete: (key: string) => fetch(`/admin/media/${encodeURIComponent(key)}`, { method: 'DELETE', headers }),
-    get:    (id: string) => get(`/admin/media/${id}`),
+  function xhrUpload(url: string, method: 'POST' | 'PUT', form: FormData, onProgress: (pct: number) => void): Promise<Response> {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest()
+      xhr.open(method, url)
+      xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100))
+      }
+      xhr.onload = () => resolve(new Response(xhr.responseText, { status: xhr.status }))
+      xhr.onerror = () => reject(new Error('Erreur réseau'))
+      xhr.send(form)
+    })
   }
 
   return {
-    hero:         crud('/admin/hero'),
-    media:        mediaApi,
-    mediaUpload:  mediaApi,
-    activity: {
-      list: (limit = 30) => get<ActivityEntry[]>(`/admin/activity?limit=${limit}`),
+    hero: {
+      create: (form: FormData) =>
+        fetch(`${API_URL}/admin/hero`, { method: 'POST', headers: auth, body: form }),
+      update: (id: string, form: FormData) =>
+        fetch(`${API_URL}/admin/hero/${id}`, { method: 'PUT', headers: auth, body: form }),
+      delete: (id: string) =>
+        fetch(`${API_URL}/admin/hero/${id}`, { method: 'DELETE', headers: auth }),
     },
-    bigHero:      crud('/admin/big-hero'),
-    newsletter: {
-      list:   () => get<Newsletter[]>('/admin/newsletter'),
-      delete: (id: string) => fetch(`/admin/newsletter/${id}`, { method: 'DELETE', headers }),
+    bigHero: {
+      list: (): Promise<BigHeroSlide[]> =>
+        fetch(`${API_URL}/admin/big-hero`, { headers: auth }).then((r) => r.json()),
+      delete: (id: string) =>
+        fetch(`${API_URL}/admin/big-hero/${id}`, { method: 'DELETE', headers: auth }),
+    },
+    bigHeroUpload: {
+      create: (form: FormData, onProgress: (pct: number) => void) =>
+        xhrUpload(`${API_URL}/admin/big-hero`, 'POST', form, onProgress),
+      update: (id: string, form: FormData, onProgress: (pct: number) => void) =>
+        xhrUpload(`${API_URL}/admin/big-hero/${id}`, 'PUT', form, onProgress),
+    },
+    news: {
+      create: (form: FormData) =>
+        fetch(`${API_URL}/admin/news`, { method: 'POST', headers: auth, body: form }),
+      update: (id: string, form: FormData) =>
+        fetch(`${API_URL}/admin/news/${id}`, { method: 'PUT', headers: auth, body: form }),
+      delete: (id: string) =>
+        fetch(`${API_URL}/admin/news/${id}`, { method: 'DELETE', headers: auth }),
+    },
+    gallery: {
+      create: (form: FormData) =>
+        fetch(`${API_URL}/admin/gallery`, { method: 'POST', headers: auth, body: form }),
+      update: (id: string, form: FormData) =>
+        fetch(`${API_URL}/admin/gallery/${id}`, { method: 'PUT', headers: auth, body: form }),
+      delete: (id: string) =>
+        fetch(`${API_URL}/admin/gallery/${id}`, { method: 'DELETE', headers: auth }),
+    },
+    events: {
+      create: (form: FormData) =>
+        fetch(`${API_URL}/admin/events`, { method: 'POST', headers: auth, body: form }),
+      update: (id: string, form: FormData) =>
+        fetch(`${API_URL}/admin/events/${id}`, { method: 'PUT', headers: auth, body: form }),
+      delete: (id: string) =>
+        fetch(`${API_URL}/admin/events/${id}`, { method: 'DELETE', headers: auth }),
+    },
+    contacts: {
+      list: (): Promise<ContactMessage[]> =>
+        fetch(`${API_URL}/admin/contacts`, { headers: auth }).then((r) => r.json()),
+      get: (id: string): Promise<ContactMessage> =>
+        fetch(`${API_URL}/admin/contacts/${id}`, { headers: auth }).then((r) => r.json()),
+      update: (id: string, form: FormData) =>
+        fetch(`${API_URL}/admin/contacts/${id}`, { method: 'PUT', headers: auth, body: form }),
+      delete: (id: string) =>
+        fetch(`${API_URL}/admin/contacts/${id}`, { method: 'DELETE', headers: auth }),
+    },
+    associations: {
+      create: (form: FormData) =>
+        fetch(`${API_URL}/admin/associations`, { method: 'POST', headers: auth, body: form }),
+      update: (id: string, form: FormData) =>
+        fetch(`${API_URL}/admin/associations/${id}`, { method: 'PUT', headers: auth, body: form }),
+      updateContent: (id: string, form: FormData) =>
+        fetch(`${API_URL}/admin/associations/${id}/content`, { method: 'PUT', headers: auth, body: form }),
+      delete: (id: string) =>
+        fetch(`${API_URL}/admin/associations/${id}`, { method: 'DELETE', headers: auth }),
+    },
+    experts: {
+      create: (form: FormData) =>
+        fetch(`${API_URL}/admin/experts`, { method: 'POST', headers: auth, body: form }),
+      update: (id: string, form: FormData) =>
+        fetch(`${API_URL}/admin/experts/${id}`, { method: 'PUT', headers: auth, body: form }),
+      delete: (id: string) =>
+        fetch(`${API_URL}/admin/experts/${id}`, { method: 'DELETE', headers: auth }),
+    },
+    advisors: {
+      list: (): Promise<Advisor[]> =>
+        fetch(`${API_URL}/admin/advisors`, { headers: auth }).then((r) => r.json()),
+      create: (form: FormData) =>
+        fetch(`${API_URL}/admin/advisors`, { method: 'POST', headers: auth, body: form }),
+      update: (id: string, form: FormData) =>
+        fetch(`${API_URL}/admin/advisors/${id}`, { method: 'PUT', headers: auth, body: form }),
+      delete: (id: string) =>
+        fetch(`${API_URL}/admin/advisors/${id}`, { method: 'DELETE', headers: auth }),
+    },
+    media: {
+      upload: (form: FormData) =>
+        fetch(`${API_URL}/admin/media`, { method: 'POST', headers: auth, body: form }),
+      delete: (key: string) =>
+        fetch(`${API_URL}/admin/media/${encodeURIComponent(key)}`, { method: 'DELETE', headers: auth }),
+      get: (id: string) =>
+        fetch(`${API_URL}/admin/media/${id}`, { headers: auth }).then((r) => r.json()),
+    },
+    mediaUpload: {
+      upload: (form: FormData, onProgress: (pct: number) => void) =>
+        xhrUpload(`${API_URL}/admin/media`, 'POST', form, onProgress),
+    },
+    activity: {
+      list: (limit = 30): Promise<ActivityEntry[]> =>
+        fetch(`${API_URL}/admin/activity?limit=${limit}`, { headers: auth }).then((r) => r.json()),
     },
     users: {
-      ...crud('/admin/users'),
-      list: () => get<User[]>('/admin/users'),
+      list: (): Promise<User[]> =>
+        fetch(`${API_URL}/admin/users`, { headers: auth }).then((r) => r.json()),
+      create: (data: { name: string; email: string; role?: string }) =>
+        fetch(`${API_URL}/admin/users`, { method: 'POST', headers: { ...auth, 'Content-Type': 'application/json' }, body: JSON.stringify(data) }),
+      update: (id: string, data: Partial<User>) =>
+        fetch(`${API_URL}/admin/users/${id}`, { method: 'PUT', headers: { ...auth, 'Content-Type': 'application/json' }, body: JSON.stringify(data) }),
+      delete: (id: string) =>
+        fetch(`${API_URL}/admin/users/${id}`, { method: 'DELETE', headers: auth }),
     },
-    news:         crud('/admin/news'),
-    gallery:      crud('/admin/gallery'),
-    events:       crud('/admin/events'),
-    contacts: {
-      list:   () => get<ContactMessage[]>('/admin/contacts'),
-      get:    (id: string) => get<ContactMessage>(`/admin/contacts/${id}`),
-      update: (id: string, form: FormData) => fetch(`/admin/contacts/${id}`, { method: 'PUT', body: form, headers }),
-      delete: (id: string) => fetch(`/admin/contacts/${id}`, { method: 'DELETE', headers }),
+    newsletter: {
+      list: (): Promise<NewsletterSubscriber[]> =>
+        fetch(`${API_URL}/admin/newsletter`, { headers: auth }).then((r) => r.json()),
+      toggle: (id: string, active: number) =>
+        fetch(`${API_URL}/admin/newsletter/${id}`, { method: 'PUT', headers: { ...auth, 'Content-Type': 'application/json' }, body: JSON.stringify({ active }) }),
+      delete: (id: string) =>
+        fetch(`${API_URL}/admin/newsletter/${id}`, { method: 'DELETE', headers: auth }),
     },
-    associations: crud('/admin/associations'),
-    experts:      crud('/admin/experts'),
   }
 }
+
+export type Newsletter = NewsletterSubscriber

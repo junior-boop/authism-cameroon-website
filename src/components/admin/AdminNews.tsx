@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
-import { api, adminApi, mediaUrl, type News } from "../../lib/api";
+import { api, adminApi, mediaUrl, type News, type User } from "../../lib/api";
 import MediaField from "./MediaField";
+import RichTextEditor from "./RichTextEditor";
+import SlugField from "./SlugField";
 
 export default function AdminNews({ token }: { token: string }) {
   const [items, setItems] = useState<News[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ open: boolean; item?: News }>({ open: false });
   const [saving, setSaving] = useState(false);
@@ -12,7 +15,10 @@ export default function AdminNews({ token }: { token: string }) {
   const reload = () =>
     api.news().then(setItems).catch(() => setError("Erreur de chargement")).finally(() => setLoading(false));
 
-  useEffect(() => { reload(); }, []);
+  useEffect(() => {
+    reload();
+    adminApi(token).users.list().then(setUsers).catch(() => {});
+  }, [token]);
 
   async function handleSave(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -108,17 +114,32 @@ export default function AdminNews({ token }: { token: string }) {
 
       {modal.open && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between px-6 py-4 border-b">
               <h2 className="font-bold text-gray-900">{modal.item ? "Modifier l'actualité" : "Nouvelle actualité"}</h2>
               <button onClick={() => setModal({ open: false })} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
             </div>
             <form onSubmit={handleSave} className="p-6 flex flex-col gap-4">
               <Field label="Titre *" name="title" required defaultValue={modal.item?.title} />
-              <Field label="Slug" name="slug" defaultValue={modal.item?.slug ?? ""} />
+              <SlugField sourceName="title" defaultValue={modal.item?.slug ?? ""} />
               <Field label="Extrait" name="excerpt" textarea defaultValue={modal.item?.excerpt ?? ""} />
-              <Field label="Contenu" name="content" textarea rows={8} defaultValue={modal.item?.content ?? ""} />
-              <Field label="Auteur" name="author" defaultValue={modal.item?.author ?? ""} />
+              <RichTextEditor label="Contenu" name="content" rows={10} defaultValue={modal.item?.content ?? ""} token={token} defaultFolder="news" />
+              <label className="flex flex-col gap-1 text-sm text-gray-700">
+                Auteur
+                <select
+                  name="author"
+                  defaultValue={modal.item?.author ?? ""}
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#00bcd4] bg-white"
+                >
+                  <option value="">— Aucun —</option>
+                  {users.filter((u) => u.active !== 0).map((u) => (
+                    <option key={u.id} value={u.name}>{u.name} ({u.email})</option>
+                  ))}
+                  {modal.item?.author && !users.some((u) => u.name === modal.item?.author) && (
+                    <option value={modal.item.author}>{modal.item.author} (ancien)</option>
+                  )}
+                </select>
+              </label>
               <Field label="Catégorie" name="category" defaultValue={modal.item?.category ?? ""} />
               <Field label="Date de publication" name="published_at" type="date" defaultValue={modal.item?.published_at?.slice(0, 10) ?? ""} />
               <label className="flex items-center gap-2 text-sm text-gray-700">

@@ -1,14 +1,15 @@
 {
+  "compatibility_date": "2026-05-07",
+  "compatibility_flags": [
+    "global_fetch_strictly_public"
+  ],
   "name": "authism-cameroon-website",
-  "compatibility_date": "2025-04-01",
-  "compatibility_flags": ["nodejs_compat"],
-  "main": "./dist/_worker.js/index.js",
+  "main": "@astrojs/cloudflare/entrypoints/server",
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS"
   },
   "observability": {
     "enabled": true
-  },
-  "upload_source_maps": true
+  }
 }

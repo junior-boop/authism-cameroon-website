@@ -82,7 +82,7 @@ export default function MediaPickerModal({ token, onSelect, onClose, defaultFold
 
   return createPortal(
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col relative">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-[1080px] h-[90vh] flex flex-col relative">
 
         {/* Upload overlay */}
         {uploading && (

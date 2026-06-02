@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { api, adminApi, mediaUrl, type Event } from "../../lib/api";
 import MediaField from "./MediaField";
+import SlugField from "./SlugField";
 
 export default function AdminEvents({ token }: { token: string }) {
   const [items, setItems] = useState<Event[]>([]);
@@ -120,7 +121,7 @@ export default function AdminEvents({ token }: { token: string }) {
             </div>
             <form onSubmit={handleSave} className="p-6 flex flex-col gap-4">
               <Field label="Titre *" name="title" required defaultValue={modal.item?.title} />
-              <Field label="Slug" name="slug" defaultValue={modal.item?.slug ?? ""} />
+              <SlugField sourceName="title" defaultValue={modal.item?.slug ?? ""} />
               <Field label="Description" name="description" textarea rows={5} defaultValue={modal.item?.description ?? ""} />
               <Field label="Lieu" name="location" defaultValue={modal.item?.location ?? ""} />
               <div className="grid grid-cols-2 gap-4">
