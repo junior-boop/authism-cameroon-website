@@ -9,8 +9,19 @@ const token = Astro.cookies.get("admin_token")?.value ?? "";
 <AdminLayout title='Tableau de bord' active='dashboard'>
   <AdminDashboardCards token={token} client:load />
 
-  <div>
-    <h2 class='text-base font-bold text-gray-900 mb-4'>Activité récente</h2>
+  <section class='bg-white border border-gray-200 rounded-2xl p-6'>
+    <div class='flex items-center justify-between mb-4'>
+      <div>
+        <h2 class='text-base font-bold text-gray-900'>Activité récente</h2>
+        <p class='text-xs text-gray-400 mt-0.5'>
+          Derniers ajouts, modifications et suppressions
+        </p>
+      </div>
+      <span
+        class='text-[11px] font-semibold uppercase tracking-wider text-gray-400'>
+        En direct
+      </span>
+    </div>
     <AdminActivity token={token} client:load />
-  </div>
+  </section>
 </AdminLayout>

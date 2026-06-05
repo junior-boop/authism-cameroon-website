@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:8788'
+const API_URL = 'http://localhost:8788' || 'https://autiste-serveur.godigital.workers.dev'
 
 export function slugify(input: string | null | undefined): string {
   if (!input) return ''

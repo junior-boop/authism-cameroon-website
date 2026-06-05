@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import logo from "../assets/logo.png";
+
 interface Props {
   title?: string;
   active?: string;
@@ -8,20 +9,121 @@ interface Props {
 
 const { title = "Administration", active = "" } = Astro.props;
 
-const nav = [
-  { href: "/admin", label: "Tableau de bord", key: "dashboard" },
-  { href: "/admin/news", label: "Actualités", key: "news" },
-  { href: "/admin/events", label: "Événements", key: "events" },
-  { href: "/admin/experts", label: "Conseils des Pros", key: "experts" },
-  { href: "/admin/advisors", label: "Conseillers", key: "advisors" },
-  { href: "/admin/associations", label: "Associations", key: "associations" },
-  { href: "/admin/gallery", label: "Galerie", key: "gallery" },
-  { href: "/admin/contacts", label: "Messages", key: "contacts" },
-  { href: "/admin/hero", label: "Bannières", key: "hero" },
-  { href: "/admin/big-hero", label: "Big Hero", key: "big-hero" },
-  { href: "/admin/media", label: "Médias", key: "media" },
-  { href: "/admin/users", label: "Utilisateurs", key: "users" },
-  { href: "/admin/newsletter", label: "Newsletter", key: "newsletter" },
+type NavItem = { href: string; label: string; key: string; icon: string };
+type NavGroup = { label: string; items: NavItem[] };
+
+// Heroicons (outline) inline SVG paths — width/height contrôlés via la classe
+const I = {
+  dashboard:
+    "M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6Zm9.75 0a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6Zm-9.75 9.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25Zm9.75 0a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z",
+  news: "M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a1.5 1.5 0 0 1-3 0V5.25A2.25 2.25 0 0 0 16.5 3h-9a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h9a2.25 2.25 0 0 0 2.25-2.25V18M6.75 7.5H9m-2.25 3H9",
+  events:
+    "M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5",
+  experts:
+    "M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z",
+  advisors:
+    "M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z",
+  associations:
+    "M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418",
+  gallery:
+    "m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z",
+  contacts:
+    "M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75",
+  hero: "M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25",
+  bighero:
+    "M2.25 15.75 7.41 10.59a2.25 2.25 0 0 1 3.18 0l5.16 5.16m-1.5-1.5 1.41-1.41a2.25 2.25 0 0 1 3.18 0l2.91 2.91M19.5 7.5a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z",
+  media:
+    "M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 0 0-1.883 2.542l.857 6a2.25 2.25 0 0 0 2.227 1.932H19.05a2.25 2.25 0 0 0 2.227-1.932l.857-6a2.25 2.25 0 0 0-1.883-2.542m-16.5 0V6A2.25 2.25 0 0 1 6 3.75h3.879a1.5 1.5 0 0 1 1.06.44l2.122 2.12a1.5 1.5 0 0 0 1.06.44H18A2.25 2.25 0 0 1 20.25 9v.776",
+  users:
+    "M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z",
+  newsletter:
+    "M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3",
+};
+
+const groups: NavGroup[] = [
+  {
+    label: "Espace",
+    items: [
+      {
+        href: "/admin",
+        label: "Tableau de bord",
+        key: "dashboard",
+        icon: I.dashboard,
+      },
+    ],
+  },
+  {
+    label: "Contenu",
+    items: [
+      { href: "/admin/news", label: "Actualités", key: "news", icon: I.news },
+      {
+        href: "/admin/events",
+        label: "Événements",
+        key: "events",
+        icon: I.events,
+      },
+      {
+        href: "/admin/experts",
+        label: "Conseils des Pros",
+        key: "experts",
+        icon: I.experts,
+      },
+      {
+        href: "/admin/advisors",
+        label: "Conseillers",
+        key: "advisors",
+        icon: I.advisors,
+      },
+      {
+        href: "/admin/associations",
+        label: "Associations",
+        key: "associations",
+        icon: I.associations,
+      },
+      {
+        href: "/admin/gallery",
+        label: "Galerie",
+        key: "gallery",
+        icon: I.gallery,
+      },
+    ],
+  },
+  {
+    label: "Communication",
+    items: [
+      {
+        href: "/admin/contacts",
+        label: "Messages",
+        key: "contacts",
+        icon: I.contacts,
+      },
+      {
+        href: "/admin/newsletter",
+        label: "Newsletter",
+        key: "newsletter",
+        icon: I.newsletter,
+      },
+      { href: "/admin/hero", label: "Bannières", key: "hero", icon: I.hero },
+      {
+        href: "/admin/big-hero",
+        label: "Big Hero",
+        key: "big-hero",
+        icon: I.bighero,
+      },
+    ],
+  },
+  {
+    label: "Système",
+    items: [
+      { href: "/admin/media", label: "Médias", key: "media", icon: I.media },
+      {
+        href: "/admin/users",
+        label: "Utilisateurs",
+        key: "users",
+        icon: I.users,
+      },
+    ],
+  },
 ];
 ---
 
@@ -34,47 +136,128 @@ const nav = [
     <link rel='icon' href={logo.src} />
     <link rel='apple-touch-icon' href={logo.src} />
     <meta name='generator' content={Astro.generator} />
-
     <title>{title} — Authism Cameroon Admin</title>
   </head>
-  <body class='bg-gray-100 h-screen flex overflow-hidden'>
+  <body class='bg-gray-50 h-screen flex overflow-hidden text-gray-900'>
     <!-- Sidebar -->
     <aside
-      class='w-60 bg-gray-900 text-white flex flex-col shrink-0 h-full overflow-y-auto'>
-      <div class='px-6 py-5 border-b border-gray-700'>
-        <p class='font-bold text-sm uppercase tracking-widest text-[#00bcd4]'>
-          Authism Cameroon
-        </p>
-        <p class='text-xs text-gray-400 mt-0.5'>Administration</p>
+      class='w-72 bg-white border-r border-gray-200 flex flex-col shrink-0 h-full overflow-y-auto'>
+      <!-- Brand -->
+      <div class='px-5 pt-6 pb-4 flex items-center gap-3'>
+        <div
+          class='w-9 h-9 rounded-xl flex items-center justify-center shrink-0 overflow-hidden'>
+          <img src={logo.src} alt='' class='w-9 h-9 object-contain' />
+        </div>
+        <div class='leading-tight'>
+          <p class='font-bold text-gray-900 text-[15px]'>Authism CM</p>
+          <p class='text-[11px] text-gray-400'>Administration</p>
+        </div>
       </div>
-      <nav class='flex flex-col py-4 gap-1 flex-1'>
+
+      <!-- Profile card -->
+      <div class='px-4 mb-4'>
+        <div
+          class='flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2.5'>
+          <div
+            class='w-9 h-9 rounded-full bg-gradient-to-br from-[#00bcd4] to-[#00838f] flex items-center justify-center text-white font-bold text-sm shrink-0'>
+            A
+          </div>
+          <div class='flex-1 min-w-0'>
+            <p class='text-sm font-semibold text-gray-900 truncate'>Admin</p>
+            <p class='text-[11px] text-gray-400 truncate'>
+              Compte administrateur
+            </p>
+          </div>
+          <svg
+            class='w-4 h-4 text-gray-300 shrink-0'
+            viewBox='0 0 24 24'
+            fill='none'
+            stroke='currentColor'
+            stroke-width='2'>
+            <path
+              stroke-linecap='round'
+              stroke-linejoin='round'
+              d='m9 18 6-6-6-6'></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Nav -->
+      <nav class='flex-1 px-3 pb-4 space-y-5'>
         {
-          nav.map((item) => (
-            <a
-              href={item.href}
-              class={`px-6 py-2.5 text-sm font-medium transition-colors ${
-                active === item.key
-                  ? "bg-[#00bcd4] text-white"
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white"
-              }`}>
-              {item.label}
-            </a>
+          groups.map((group) => (
+            <div>
+              <p class='px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-400'>
+                {group.label}
+              </p>
+              <div class='space-y-0.5'>
+                {group.items.map((item) => {
+                  const isActive = active === item.key;
+                  return (
+                    <a
+                      href={item.href}
+                      class={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        isActive
+                          ? "bg-[#e0f7fa] text-[#00838f]"
+                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      }`}>
+                      <svg
+                        class={`w-[18px] h-[18px] shrink-0 ${isActive ? "text-[#00bcd4]" : "text-gray-400"}`}
+                        viewBox='0 0 24 24'
+                        fill='none'
+                        stroke='currentColor'
+                        stroke-width='1.7'>
+                        <path
+                          stroke-linecap='round'
+                          stroke-linejoin='round'
+                          d={item.icon}
+                        />
+                      </svg>
+                      <span class='truncate'>{item.label}</span>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
           ))
         }
       </nav>
-      <div class='px-6 py-4 border-t border-gray-700'>
+
+      <!-- Bottom card -->
+      <div class='px-4 pb-5'>
         <a
           href='/'
-          class='text-base text-gray-500 hover:text-gray-300 transition-colors flex items-center gap-2'>
-          ← Retour au site
+          class='block rounded-xl bg-[#00bcd4]/20 p-4 hover:shadow-md transition-shadow'>
+          <div
+            class='w-8 h-8 rounded-lg bg-black/30 flex items-center justify-center mb-2'>
+            <svg
+              class='w-4 h-4 text-white'
+              viewBox='0 0 24 24'
+              fill='none'
+              stroke='currentColor'
+              stroke-width='2'>
+              <path
+                stroke-linecap='round'
+                stroke-linejoin='round'
+                d='M10 19l-7-7m0 0l7-7m-7 7h18'></path>
+            </svg>
+          </div>
+          <p class='font-bold text-sm text-gray-900'>Retour au site</p>
+          <p class='text-[11px] text-gray-600 mt-0.5 leading-snug'>
+            Consultez le site public d'Authism Cameroon
+          </p>
         </a>
       </div>
     </aside>
 
     <!-- Main -->
-    <main class='flex-1 p-8 overflow-auto'>
-      <h1 class='text-2xl font-extrabold text-gray-900 mb-6'>{title}</h1>
-      <slot />
+    <main class='flex-1 overflow-auto'>
+      <div class='max-w-7xl mx-auto px-8 py-8'>
+        <h1 class='text-3xl font-extrabold text-gray-900 mb-6 tracking-tight'>
+          {title}
+        </h1>
+        <slot />
+      </div>
     </main>
   </body>
 </html>
