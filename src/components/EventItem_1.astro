@@ -1,17 +1,20 @@
 ---
-import { Image } from "astro:assets";
 import imageTemplate from "../assets/blog-placeholder-3.jpg";
 
 interface Props {
     title?: string;
     subtitle?: string;
-    imageSrc?: string;
+    imageSrc?: string | null;
     imageAlt?: string;
     url?: string;
     date?: string;
+    time?: string;
+    location?: string;
 }
 
 const date = Astro.props.date || "12 Mars, 2026";
+const time = Astro.props.time || "de 14h30 - 18h";
+const location = Astro.props.location || "Centre Culturel Francais de Douala";
 const title =
     Astro.props.title ||
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit";
@@ -21,28 +24,28 @@ const subtitle =
 const subtitle_substring =
     subtitle.length > 68 ? subtitle.substring(0, 69) + "..." : subtitle;
 
-const imageSrc = Astro.props.imageSrc || imageTemplate;
+const imageSrc = Astro.props.imageSrc || imageTemplate.src;
 const imageAlt = Astro.props.imageAlt || "images";
 
 const url = Astro.props.url || "/";
 const urlTitle = "lire plus";
 ---
 
-<div class='flex flex-col gap-4 items-start bg-gray-100 h-[560px]'>
-    <div class='flex justify-between px-6 pt-6'>
+<div class='flex flex-col gap-4 items-start bg-gray-100'>
+    <div class='flex w-full justify-between px-6 pt-6'>
         <a href={url} class='flex flex-col w-[60%]'>
             <span class='hover:underline font-black text-lg line-height'
                 >{date}</span
             >
             <span class='text-lg line-height text-gray-700 mt-2'
-                >de 14h30 - 18h</span
+                >{time}</span
             >
             <span class='text-lg line-height mt-2'
-                >Centre Culturel Francais de Douala</span
+                >{location}</span
             >
         </a>
         <a class='images' href={url}>
-            <Image src={imageSrc as string} alt={imageAlt} />
+            <img src={imageSrc} alt={imageAlt} />
         </a>
     </div>
     <div class='px-6 pb-6 flex-1'>

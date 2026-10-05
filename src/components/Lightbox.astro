@@ -1,0 +1,105 @@
+---
+---
+
+<div
+	data-lightbox-root
+	class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 p-4"
+>
+	<button
+		type="button"
+		data-lightbox-close
+		aria-label="Fermer"
+		class="absolute top-4 right-4 sm:top-6 sm:right-6 text-3xl leading-none text-white/80 hover:text-white"
+	>
+		&times;
+	</button>
+	<button
+		type="button"
+		data-lightbox-prev
+		aria-label="Image précédente"
+		class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 text-4xl leading-none text-white/80 hover:text-white"
+	>
+		&#8249;
+	</button>
+	<img data-lightbox-image src="" alt="" class="max-h-full max-w-full object-contain" />
+	<button
+		type="button"
+		data-lightbox-next
+		aria-label="Image suivante"
+		class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 text-4xl leading-none text-white/80 hover:text-white"
+	>
+		&#8250;
+	</button>
+</div>
+
+<script>
+	const root = document.querySelector("[data-lightbox-root]");
+	const image = root?.querySelector("[data-lightbox-image]");
+	const prevBtn = root?.querySelector("[data-lightbox-prev]");
+	const nextBtn = root?.querySelector("[data-lightbox-next]");
+
+	let items = [];
+	let index = 0;
+
+	function show(i) {
+		if (!image || items.length === 0) return;
+		index = (i + items.length) % items.length;
+		image.src = items[index].src;
+		image.alt = items[index].alt;
+		const hasMultiple = items.length > 1;
+		if (prevBtn) prevBtn.classList.toggle("hidden", !hasMultiple);
+		if (nextBtn) nextBtn.classList.toggle("hidden", !hasMultiple);
+	}
+
+	function openLightbox(triggers, startIndex) {
+		if (!root) return;
+		items = triggers.map((el) => ({
+			src: el.dataset.lightboxSrc,
+			alt: el.dataset.lightboxAlt ?? "",
+		}));
+		show(startIndex);
+		root.classList.remove("hidden");
+		root.classList.add("flex");
+		document.body.style.overflow = "hidden";
+	}
+
+	function closeLightbox() {
+		if (!root || !image) return;
+		root.classList.add("hidden");
+		root.classList.remove("flex");
+		document.body.style.overflow = "";
+		image.src = "";
+		items = [];
+	}
+
+	document.addEventListener("click", (event) => {
+		const trigger = event.target.closest("[data-lightbox-src]");
+		if (trigger) {
+			event.preventDefault();
+			const group = trigger.dataset.lightboxGroup;
+			const triggers = group
+				? Array.from(document.querySelectorAll(`[data-lightbox-group="${group}"]`))
+				: [trigger];
+			openLightbox(triggers, triggers.indexOf(trigger));
+			return;
+		}
+		if (event.target.closest("[data-lightbox-close]") || event.target === root) {
+			closeLightbox();
+			return;
+		}
+		if (event.target.closest("[data-lightbox-prev]")) {
+			show(index - 1);
+			return;
+		}
+		if (event.target.closest("[data-lightbox-next]")) {
+			show(index + 1);
+		}
+	});
+
+	document.addEventListener("keydown", (event) => {
+		if (root?.classList.contains("hidden")) return;
+		if (event.key === "Escape") closeLightbox();
+		if (event.key === "ArrowLeft") show(index - 1);
+		if (event.key === "ArrowRight") show(index + 1);
+	});
+</script>

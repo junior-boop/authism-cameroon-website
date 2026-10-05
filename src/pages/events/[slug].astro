@@ -1,0 +1,133 @@
+---
+import BaseHead from "../../components/BaseHead.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import Container from "../../components/Container.astro";
+import ProseImages from "../../components/ProseImages.astro";
+import JoinCta from "../../components/JoinCta.astro";
+import { api, mediaUrl, type Event } from "../../lib/api";
+
+const { slug } = Astro.params;
+
+let event: Event | null = null;
+try {
+	const all = await api.events();
+	event = all.find((e) => e.slug === slug || e.id === slug) ?? null;
+} catch {
+	event = null;
+}
+
+if (!event) {
+	Astro.response.status = 404;
+}
+
+const formattedDate = event?.start_date
+	? new Date(event.start_date).toLocaleDateString("fr-FR", {
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+		})
+	: null;
+
+const formattedTime = event?.start_date
+	? (() => {
+			const start = new Date(event.start_date!).toLocaleTimeString("fr-FR", {
+				hour: "2-digit",
+				minute: "2-digit",
+			});
+			if (!event?.end_date) return `à partir de ${start}`;
+			const end = new Date(event.end_date).toLocaleTimeString("fr-FR", {
+				hour: "2-digit",
+				minute: "2-digit",
+			});
+			return `de ${start} - ${end}`;
+		})()
+	: null;
+---
+
+<!doctype html>
+<html lang="fr">
+	<head>
+		<BaseHead
+			title={event ? event.title : "Événement introuvable"}
+			description={event?.description?.replace(/<[^>]+>/g, "").slice(0, 160) ??
+				"Cet événement n'a pas été trouvé."}
+		/>
+	</head>
+	<body>
+		<Header />
+
+		{
+			event ? (
+				<>
+					<section class="bg-gray-50">
+						<Container>
+							<div class="py-16 md:py-20 max-w-3xl mx-auto text-center">
+								<h1 class="judson-bold text-4xl md:text-5xl text-[rgb(15,18,25)]">{event.title}</h1>
+							</div>
+						</Container>
+					</section>
+
+					{mediaUrl(event.cover_image) && (
+						<section class="w-full aspect-video overflow-hidden bg-gray-100">
+							<img
+								src={mediaUrl(event.cover_image)!}
+								alt={event.title}
+								class="h-full w-full object-cover"
+							/>
+						</section>
+					)}
+
+					<section>
+						<Container>
+							<div class="max-w-4xl mx-auto mb-8">
+								<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-8 text-sm text-gray-500 lato-regular">
+									{formattedDate && <span>{formattedDate}</span>}
+									{formattedTime && (
+										<>
+											<span>·</span>
+											<span>{formattedTime}</span>
+										</>
+									)}
+									{event.location && (
+										<>
+											<span>·</span>
+											<span class="uppercase tracking-wide text-[#FF5656] font-bold">
+												{event.location}
+											</span>
+										</>
+									)}
+								</div>
+
+								{event.description ? (
+									<div class="sm:px-8 text-xl prose-content lato-regular text-gray-700 mt-8" set:html={event.description} />
+								) : (
+									<p class="text-xl lato-regular text-gray-500 mt-8">Aucun détail disponible pour le moment.</p>
+								)}
+							</div>
+						</Container>
+					</section>
+				</>
+			) : (
+				<section>
+					<Container>
+						<div class="py-24 text-center">
+							<h1 class="judson-bold text-4xl text-[rgb(15,18,25)]">Événement introuvable</h1>
+							<p class="lato-regular text-gray-600 mt-4">
+								Cet événement n'existe pas ou a été retiré.
+							</p>
+							<a href="/events" class="lato-bold text-[#FF5656] hover:underline mt-6 inline-block">
+								Retour aux événements
+							</a>
+						</div>
+					</Container>
+				</section>
+			)
+		}
+
+		<JoinCta />
+
+		<Footer />
+		<ProseImages />
+	</body>
+</html>

@@ -15,6 +15,8 @@ import Quotespace from "../components/Quotespace.astro";
 import ArticlesItems from "../components/ArticlesItems.astro";
 import ArticleItem from "../components/ArticleItem_2.astro";
 import EventItem from "../components/EventItem_1.astro";
+import JoinCta from "../components/JoinCta.astro";
+import PartnersMarquee from "../components/PartnersMarquee.astro";
 
 export const prerender = true;
 ---
@@ -38,7 +40,12 @@ export const prerender = true;
 					<ExpertView src={export_2} alt='Expert 2' />
 					<ExpertView src={export_3} alt='Expert 3' />
 				</div>
-				<Dote />
+				<!-- <Dote /> -->
+			</Container>
+		</section>
+		<PartnersMarquee />
+		<section>
+			<Container>	
 				<Title
 					title='Dans la vie de tous les jours'
 					subtitle='Découvrez comment apporter des solutions adaptées aux besoins des personnes autistes.'
@@ -47,12 +54,12 @@ export const prerender = true;
 					urlText='Voir tous les conseils'
 				/>
 				<Quotespace
-					src={export_1}
+					src={export_1.src}
 					alt='Expert 1'
 					url='/expert-views'
 					urlText="Lire tout l'article pour apprendre plus"
 				/>
-				<div class='grid grid-cols-2 gap-15 mt-20 mb-40'>
+				<div class='grid grid-cols-2 gap-12 mt-20 mb-40'>
 					<ArticlesItems
 						title='Lorem ipsum dolor sit amet, consectetur adipiscing elit'
 					/>
@@ -74,12 +81,12 @@ export const prerender = true;
 					urlText='Voir tous les conseils'
 				/>
 				<Quotespace
-					src={export_1}
+					src={export_1.src}
 					alt='Expert 1'
 					url='/expert-views'
 					urlText="Lire tout l'article pour apprendre plus"
 				/>
-				<div class='grid grid-cols-3 gap-15 mt-20 mb-40'>
+				<div class='grid grid-cols-3 gap-8 mt-20 mb-40'>
 					<ArticleItem
 						title='Lorem ipsum dolor sit amet, consectetur adipiscing elit'
 					/>
@@ -101,6 +108,9 @@ export const prerender = true;
 				</div>
 			</Container>
 		</section>
+
+		<JoinCta />
+
 		<Footer />
 	</body>
 </html>

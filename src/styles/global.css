@@ -125,7 +125,7 @@ h3,
 h4,
 h5,
 h6 {
-	color: rgb(var(--black));
+	/* color: rgb(var(--black)); */
 	line-height: 1;
 }
 
@@ -159,4 +159,42 @@ h6 {
 	clip-path: inset(50%);
 	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
 	white-space: nowrap;
+}
+
+.prose-content p {
+	margin-bottom: 1em;
+	line-height: 1.7;
+}
+.prose-content a {
+	color: #ff5656;
+	text-decoration: underline;
+}
+.prose-content img {
+	max-width: 100%;
+	height: auto;
+}
+.prose-content .prose-image-frame {
+	position: relative;
+	display: block;
+	aspect-ratio: 1 / 1;
+	overflow: hidden;
+	margin: 1.5em 0;
+	background-color: rgb(var(--gray-light));
+}
+.prose-content .prose-image-frame::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background-image: var(--prose-bg);
+	background-size: cover;
+	background-position: center;
+	filter: blur(24px) brightness(0.85);
+	transform: scale(1.15);
+}
+.prose-content .prose-image-frame img {
+	position: relative;
+	z-index: 1;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
 }

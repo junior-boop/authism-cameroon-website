@@ -1,0 +1,14 @@
+---
+---
+
+<script>
+	document.querySelectorAll(".prose-content img:not([data-framed])").forEach((img) => {
+		img.setAttribute("data-framed", "true");
+		const src = img.getAttribute("src");
+		const frame = document.createElement("span");
+		frame.className = "prose-image-frame";
+		if (src) frame.style.setProperty("--prose-bg", `url("${src}")`);
+		img.parentNode?.insertBefore(frame, img);
+		frame.appendChild(img);
+	});
+</script>

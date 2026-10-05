@@ -1,0 +1,124 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import Container from "../components/Container.astro";
+import AssociationCard from "../components/AssociationCard.astro";
+import ArticleItem_3 from "../components/ArticleItem_3.astro";
+import JoinCta from "../components/JoinCta.astro";
+import { api, mediaUrl } from "../lib/api";
+import Title from "../components/Title.astro";
+
+import export_1 from "../assets/expert_1.jpg";
+import Quotespace from "../components/Quotespace.astro";
+
+let associations: Awaited<ReturnType<typeof api.associations>> = [];
+try {
+	associations = await api.associations();
+} catch {
+	associations = [];
+}
+
+let associationArticles: Awaited<ReturnType<typeof api.news>> = [];
+try {
+	const allNews = await api.news();
+	associationArticles = allNews.filter(
+		(n) => n.category?.trim().toLowerCase() === "association",
+	);
+} catch {
+	associationArticles = [];
+}
+---
+
+<!doctype html>
+<html lang="fr">
+	<head>
+		<BaseHead
+			title="Associations partenaires"
+			description="Découvrez les associations qui accompagnent les personnes autistes et leurs familles au Cameroun."
+		/>
+	</head>
+	<body>
+		<Header />
+
+		<section class="bg-gray-50">
+			<Container>
+				<div class="py-20 md:py-28 text-center max-w-2xl mx-auto">
+					<h1 class="judson-bold text-5xl md:text-6xl text-[rgb(15,18,25)]">
+						Nos Associations Partenaires
+					</h1>
+					<p class="lato-regular text-xl text-gray-600 mt-6">
+						Découvrez les associations qui œuvrent chaque jour pour l'inclusion et
+						l'accompagnement des personnes autistes au Cameroun.
+					</p>
+				</div>
+			</Container>
+		</section>
+
+
+
+		<section>
+			<Container>
+				<div class="mt-16 sm:mt-20 lg:mt-24">
+					<div class="w-full sm:w-[75%] lg:w-[60%] judson-regular text-4xl sm:text-5xl md:text-5xl lg:text-7xl">Pour eux, c'est plus qu'une responsabilité</div>
+				</div>
+				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8 mb-32">
+					{
+						associationArticles.length > 0 ? (
+							associationArticles.map((article) => (
+								<ArticleItem_3
+									title={article.title}
+									subtitle={article.excerpt ?? undefined}
+									imageSrc={mediaUrl(article.cover_image) ?? undefined}
+									imageAlt={article.title}
+									url={`/blog/${article.slug ?? article.id}`}
+									urlTitle="Lire l'article"
+								/>
+							))
+						) : (
+							<p class="col-span-full text-center text-gray-500 lato-regular">
+								Aucun article à afficher pour le moment.
+							</p>
+						)
+					}
+				</div>
+				<Quotespace
+					src={export_1.src}
+					alt='Expert 1'
+					url='/expert-views'
+					urlText="Lire tout l'article pour apprendre plus"
+				/>
+			</Container>
+		</section>
+
+		<section>
+			<Container>
+				<Title
+					title='Quelques associations'
+					subtitle="Découvrez les associations qui œuvrent chaque jour pour l'inclusion et l'accompagnement des personnes autistes au Cameroun."
+				/>
+				<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 mt-16 mb-24">
+					{
+						associations.length > 0 ? (
+							associations.map((association) => (
+								<AssociationCard
+									name={association.name}
+									imageSrc={mediaUrl(association.logo)}
+									href={`/associations/${association.slug ?? association.id}`}
+								/>
+							))
+						) : (
+							<p class="col-span-full text-center text-gray-500 lato-regular">
+								Aucune association à afficher pour le moment.
+							</p>
+						)
+					}
+				</div>
+			</Container>
+		</section>
+
+		<JoinCta />
+
+		<Footer />
+	</body>
+</html>

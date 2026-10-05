@@ -1,0 +1,51 @@
+---
+interface Props {
+	title?: string;
+	subtitle?: string;
+	imageSrc?: string | null;
+	imageAlt?: string;
+	url?: string;
+	date?: string;
+	time?: string;
+	location?: string;
+}
+
+const title = Astro.props.title || "Lorem ipsum dolor sit amet, consectetur adipiscing elit";
+const subtitle =
+	Astro.props.subtitle ||
+	"Nulla commodo interdum tincidunt. Donec elementum massa et ligul vari.";
+
+const imageSrc = Astro.props.imageSrc;
+const imageAlt = Astro.props.imageAlt || "image";
+
+const url = Astro.props.url || "/";
+const date = Astro.props.date;
+const time = Astro.props.time;
+const location = Astro.props.location;
+---
+
+<a
+	href={url}
+	class="group grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,2fr)_auto] gap-4 sm:gap-8 items-start py-8 border-t-2 border-gray-300 no-underline"
+>
+	<h3 class="judson-bold text-xl text-[rgb(15,18,25)] group-hover:underline transition-colors">
+		{title}
+	</h3>
+	{
+		(date || time || location) && (
+			<div class="flex flex-col gap-1 text-sm lato-regular text-gray-500">
+				{date && <span class="font-bold text-[rgb(15,18,25)]">{date}</span>}
+				{time && <span>{time}</span>}
+				{location && <span>{location}</span>}
+			</div>
+		)
+	}
+	<p class="lato-regular text-gray-600">{subtitle}</p>
+	{
+		imageSrc && (
+			<div class="h-32 w-32 shrink-0 overflow-hidden bg-gray-200">
+				<img src={imageSrc} alt={imageAlt} class="h-full w-full object-cover" />
+			</div>
+		)
+	}
+</a>

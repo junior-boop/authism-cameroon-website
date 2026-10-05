@@ -16,9 +16,9 @@ const title =
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit";
 const subtitle =
     Astro.props.subtitle ||
-    "Nulla commodo interdum tincidunt. Donec elementum massa et ligul vari";
+    "Bruce Yankner and his team published research showing that lithium is a natural, biologically important element in the brain that has the potential to prevent or even reverse Alzheimer’s disease.";
 const subtitle_substring =
-    subtitle.length > 68 ? subtitle.substring(0, 69) + "..." : subtitle;
+    subtitle.length > 150 ? subtitle.substring(0, 151) + "..." : subtitle;
 
 const imageSrc = Astro.props.imageSrc || imageTemplate;
 const imageAlt = Astro.props.imageAlt || "images";
@@ -27,25 +27,25 @@ const url = Astro.props.url || "/";
 const urlTitle = Astro.props.urlTitle || "Voir l'article";
 ---
 
-<div class='flex flex-col aspect-2/3 gap-3 items-start bg-gray-100'>
+<div class='group flex flex-col aspect-2/3 gap-3 items-start bg-gray-100'>
     <a class='images' href={url}>
-        <img src={imageSrc as string} alt={imageAlt} />
+        <img src={imageSrc as string} alt={imageAlt} class = "scale-100 group-hover:scale-110 transition-transform duration-500" />
     </a>
-    <div class='px-6 pb-6'>
+    <div class='flex flex-1 px-6 pb-6 h-[250px]'>
         <a
             href={url}
-            class='flex flex-col mt-4 justify-between w-full h-[250px]'>
+            class='flex flex-1 flex-col mt-4 justify-between w-full'>
             <span class='flex flex-col gap-4'>
-                <span class='hover:underline judson-bold text-3xl line-height'
+                <span class='group-hover:underline judson-bold text-4xl'
                     >{title}</span
                 >
                 <span class='text-lg line-height'>{subtitle_substring}</span>
             </span>
 
             <span
-                class='flex gap-4 items-center hover:underline mt-4 text-lg font-bold text-gray-700'>
+                class='flex gap-4 items-center group-hover:underline mt-4 text-lg font-bold text-gray-700'>
                 <div
-                    class='flex items-center justify-center w-9 h-9 rounded-full bg-gray-600 hover:bg-gray-900 text-white'>
+                    class='flex items-center justify-center w-9 h-9 rounded-full bg-gray-600 group-hover:bg-gray-900 text-white'>
                     <svg
                         xmlns='http://www.w3.org/2000/svg'
                         width='24'
@@ -66,16 +66,18 @@ const urlTitle = Astro.props.urlTitle || "Voir l'article";
 
 <style>
     .line-height {
-        line-height: 1.1;
+        line-height: 1.3;
     }
     .images {
         width: 100%;
-        aspect-ratio: 4/3;
+        aspect-ratio: 13/9;
+        overflow: hidden;
 
         img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: top;
         }
     }
 </style>

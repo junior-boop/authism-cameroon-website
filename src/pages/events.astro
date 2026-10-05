@@ -1,0 +1,141 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import Container from "../components/Container.astro";
+import EventItem_1 from "../components/EventItem_1.astro";
+import EventItem_2 from "../components/EventItem_2.astro";
+import JoinCta from "../components/JoinCta.astro";
+import placeholder1 from "../assets/blog-placeholder-1.jpg";
+import placeholder2 from "../assets/blog-placeholder-2.jpg";
+import placeholder3 from "../assets/blog-placeholder-3.jpg";
+import placeholder4 from "../assets/blog-placeholder-4.jpg";
+import placeholder5 from "../assets/blog-placeholder-5.jpg";
+
+const fakeEvents = [
+	{
+		title: "Journée de sensibilisation à l'autisme",
+		subtitle: "Ateliers, témoignages et échanges avec les familles à Yaoundé.",
+		imageSrc: placeholder1.src,
+		date: "2 avril 2026",
+		time: "de 9h00 - 16h00",
+		location: "Palais des Congrès, Yaoundé",
+	},
+	{
+		title: "Formation des enseignants sur l'inclusion scolaire",
+		subtitle: "Outils et méthodes pour accueillir les enfants autistes en classe.",
+		imageSrc: placeholder2.src,
+		date: "15 avril 2026",
+		time: "de 8h30 - 13h00",
+		location: "Lycée Général Leclerc, Yaoundé",
+	},
+	{
+		title: "Marche pour l'inclusion",
+		subtitle: "Une marche citoyenne pour sensibiliser le grand public.",
+		imageSrc: placeholder3.src,
+		date: "22 avril 2026",
+		time: "de 7h00 - 11h00",
+		location: "Boulevard du 20 mai, Douala",
+	},
+	{
+		title: "Atelier parents-enfants",
+		subtitle: "Un moment d'échange et de jeux adaptés entre parents et enfants.",
+		imageSrc: placeholder4.src,
+		date: "6 mai 2026",
+		time: "de 10h00 - 12h30",
+		location: "Centre Culturel, Douala",
+	},
+	{
+		title: "Conférence sur les troubles du spectre autistique",
+		subtitle: "Des experts partagent les avancées de la recherche.",
+		imageSrc: placeholder5.src,
+		date: "18 mai 2026",
+		time: "de 14h00 - 17h00",
+		location: "Université de Yaoundé I",
+	},
+	{
+		title: "Collecte de fonds pour les associations partenaires",
+		subtitle: "Soirée caritative au profit des associations membres du réseau.",
+		imageSrc: placeholder1.src,
+		date: "30 mai 2026",
+		time: "à partir de 18h00",
+		location: "Hôtel Mont Fébé, Yaoundé",
+	},
+	{
+		title: "Journée portes ouvertes",
+		subtitle: "Découvrez les actions menées par nos associations partenaires.",
+		imageSrc: placeholder2.src,
+		date: "12 juin 2026",
+		time: "de 9h00 - 15h00",
+		location: "Bafoussam",
+	},
+];
+
+const [cardEvents, listEvents] = [fakeEvents.slice(0, 3), fakeEvents.slice(3)];
+---
+
+<!doctype html>
+<html lang="fr">
+	<head>
+		<BaseHead
+			title="Événements"
+			description="Découvrez les prochains événements organisés pour les personnes autistes et leurs familles au Cameroun."
+		/>
+	</head>
+	<body>
+		<Header />
+
+		<section class="bg-gray-50">
+			<Container>
+				<div class="py-20 md:py-28 text-center max-w-2xl mx-auto">
+					<h1 class="judson-bold text-5xl md:text-6xl text-[rgb(15,18,25)]">Nos Événements</h1>
+					<p class="lato-regular text-xl text-gray-600 mt-6">
+						Rencontres, ateliers et journées de sensibilisation organisés partout au Cameroun.
+					</p>
+				</div>
+			</Container>
+		</section>
+
+		<section>
+			<Container>
+				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-16 mb-16">
+					{
+						cardEvents.map((event) => (
+							<EventItem_1
+								title={event.title}
+								subtitle={event.subtitle}
+								imageSrc={event.imageSrc}
+								imageAlt={event.title}
+								date={event.date}
+								time={event.time}
+								location={event.location}
+								url="#"
+							/>
+						))
+					}
+				</div>
+
+				<div class="mb-24">
+					{
+						listEvents.map((event) => (
+							<EventItem_2
+								title={event.title}
+								subtitle={event.subtitle}
+								imageSrc={event.imageSrc}
+								imageAlt={event.title}
+								date={event.date}
+								time={event.time}
+								location={event.location}
+								url="#"
+							/>
+						))
+					}
+				</div>
+			</Container>
+		</section>
+
+		<JoinCta />
+
+		<Footer />
+	</body>
+</html>

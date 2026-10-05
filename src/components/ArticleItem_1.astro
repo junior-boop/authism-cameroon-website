@@ -1,16 +1,18 @@
 ---
-import { Image } from "astro:assets";
 import imageTemplate from "../assets/blog-placeholder-3.jpg";
 
 interface Props {
     title?: string;
     subtitle?: string;
-    imageSrc?: string;
+    imageSrc?: string | null;
     imageAlt?: string;
     url?: string;
-    urlTitle?: string;
+    category?: string;
+    date?: string;
 }
 
+const category = Astro.props.category || "Actualité";
+const date = Astro.props.date;
 const title =
     Astro.props.title ||
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit";
@@ -20,21 +22,27 @@ const subtitle =
 const subtitle_substring =
     subtitle.length > 68 ? subtitle.substring(0, 69) + "..." : subtitle;
 
-const imageSrc = Astro.props.imageSrc || imageTemplate;
+const imageSrc = Astro.props.imageSrc || imageTemplate.src;
 const imageAlt = Astro.props.imageAlt || "images";
 
 const url = Astro.props.url || "/";
-const urlTitle = Astro.props.urlTitle || "Voir l'article";
+const urlTitle = "lire plus";
 ---
 
-<div class='flex flex-col aspect-2/3 gap-3 items-start bg-gray-100'>
-    <a class='images' href={url}>
-        <img src={imageSrc as string} alt={imageAlt} />
-    </a>
-    <div class='px-6 pb-6'>
-        <a
-            href={url}
-            class='flex flex-col mt-4 justify-between w-full h-[250px]'>
+<div class='flex flex-col gap-4 items-start bg-gray-100'>
+    <div class='flex w-full justify-between px-6 pt-6'>
+        <a href={url} class='flex flex-col w-[60%]'>
+            <span class='hover:underline font-black text-lg line-height uppercase text-[#FF5656]'
+                >{category}</span
+            >
+            {date && <span class='text-lg line-height text-gray-700 mt-2'>{date}</span>}
+        </a>
+        <a class='images' href={url}>
+            <img src={imageSrc} alt={imageAlt} />
+        </a>
+    </div>
+    <div class='px-6 pb-6 flex-1'>
+        <a href={url} class='flex flex-col justify-between w-full h-[376px]'>
             <span class='flex flex-col gap-4'>
                 <span class='hover:underline judson-bold text-3xl line-height'
                     >{title}</span
@@ -69,8 +77,9 @@ const urlTitle = Astro.props.urlTitle || "Voir l'article";
         line-height: 1.1;
     }
     .images {
-        width: 100%;
-        aspect-ratio: 4/3;
+        width: 30%;
+        aspect-ratio: 3/4;
+        border: 1px solid #ccc;
 
         img {
             width: 100%;

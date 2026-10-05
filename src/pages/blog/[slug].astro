@@ -1,0 +1,120 @@
+---
+import BaseHead from "../../components/BaseHead.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import Container from "../../components/Container.astro";
+import ProseImages from "../../components/ProseImages.astro";
+import JoinCta from "../../components/JoinCta.astro";
+import { api, mediaUrl, type News } from "../../lib/api";
+
+const { slug } = Astro.params;
+
+let article: News | null = null;
+try {
+	const all = await api.news();
+	article = all.find((n) => n.slug === slug || n.id === slug) ?? null;
+} catch {
+	article = null;
+}
+
+if (!article) {
+	Astro.response.status = 404;
+}
+
+const publishedDate = article?.published_at ?? article?.created_at;
+const formattedDate = publishedDate
+	? new Date(publishedDate).toLocaleDateString("fr-FR", {
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+		})
+	: null;
+---
+
+<!doctype html>
+<html lang="fr">
+	<head>
+		<BaseHead
+			title={article ? article.title : "Article introuvable"}
+			description={article?.excerpt ??
+				article?.content?.replace(/<[^>]+>/g, "").slice(0, 160) ??
+				"Cet article n'a pas été trouvé."}
+		/>
+	</head>
+	<body>
+		<Header />
+
+		{
+			article ? (
+				<>
+					<section class="bg-gray-50">
+						<Container>
+							<div class="py-5 md:py-20 max-w-3xl mx-auto text-center">
+								<h1 class="judson-bold text-4xl md:text-5xl text-[rgb(15,18,25)]">{article.title}</h1>
+							</div>
+						</Container>
+					</section>
+
+					{mediaUrl(article.cover_image) && (
+						<section class="w-full sm:w-2/3 mx-auto aspect-video overflow-hidden bg-gray-100">
+							<img
+								src={mediaUrl(article.cover_image)!}
+								alt={article.title}
+								class="h-full w-full object-cover"
+							/>
+						</section>
+					)}
+
+					<section>
+						<Container>
+							<div class="max-w-4xl mx-auto mb-8">
+								<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-8 text-sm text-gray-500 lato-regular">
+									{formattedDate && <span>{formattedDate}</span>}
+									{article.category && (
+										<>
+											<span>·</span>
+											<span class="uppercase tracking-wide text-[#FF5656] font-bold">
+												{article.category}
+											</span>
+										</>
+									)}
+									{article.author && (
+										<>
+											<span>·</span>
+											<span>{article.author}</span>
+										</>
+									)}
+								</div>
+
+								{article.content ? (
+									<div class="sm:px-8 text-xl prose-content lato-regular text-gray-700 mt-8" set:html={article.content} />
+								) : (
+									<p class="text-xl lato-regular text-gray-500 mt-8">Aucun contenu disponible pour le moment.</p>
+								)}
+							</div>
+						</Container>
+					</section>
+				</>
+			) : (
+				<section>
+					<Container>
+						<div class="py-24 text-center">
+							<h1 class="judson-bold text-4xl text-[rgb(15,18,25)]">Article introuvable</h1>
+							<p class="lato-regular text-gray-600 mt-4">
+								Cet article n'existe pas ou a été retiré.
+							</p>
+							<a href="/associations" class="lato-bold text-[#FF5656] hover:underline mt-6 inline-block">
+								Retour aux associations
+							</a>
+						</div>
+					</Container>
+				</section>
+			)
+		}
+
+		<JoinCta />
+
+		<Footer />
+		<ProseImages />
+	</body>
+</html>

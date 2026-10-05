@@ -1,20 +1,24 @@
 ---
-import { Image } from "astro:assets";
+
+interface Props {
+    src?: string | null;
+    alt?: string;
+    url?: string;
+    urlText?: string;
+}
+
 const imageSrc = Astro.props.src;
 const imageAlt = Astro.props.alt;
 const url = Astro.props.url || "#";
 const urlText = Astro.props.urlText || "Voir tous les conseils";
-
 ---
 
-<blockquote class=" flex gap-15 mt-16">
-    <cite class="flex-1 aspect-square overflow-hidden">
-        <span>
-            <Image src={imageSrc} alt={imageAlt} />
-        </span>
+<blockquote class="flex flex-col sm:flex-row gap-8 sm:gap-15 mt-16">
+    <cite class="w-full sm:flex-1 aspect-square overflow-hidden block bg-gray-100">
+        {imageSrc && <img src={imageSrc} alt={imageAlt} class="h-full w-full object-cover" />}
     </cite>
-    <div class="flex-1 pt-16">
-        <div><span class="quote judson-regular text-5xl relative">L'autisme en Afrique est un enjeu de santé publique majeur, marqué par une forte stigmatisation, un manque de diagnostics précoces et de structures spécialisées.</span></div>
+    <div class="sm:flex-1 sm:pt-16">
+        <div><span class="quote judson-regular text-3xl sm:text-4xl md:text-5xl relative">L'autisme en Afrique est un enjeu de santé publique majeur, marqué par une forte stigmatisation, un manque de diagnostics précoces et de structures spécialisées.</span></div>
         <div>
             <h2 class="text-2xl font-bold judson-bold mt-9">Dr. Jane Doe</h2>
             <p class="text-sm text-gray-700">

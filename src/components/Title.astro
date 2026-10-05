@@ -14,12 +14,12 @@ const url = readmoreactive ? Astro.props.url : "#";
 const urlText = readmoreactive ? Astro.props.urlText : "Lire plus";
 ---
 
-<div class={`mt-28 flex items-start justify-between mb-5 ${readmoreactive ? "border-b-5 border-gray-900 pb-7" : ''}`}>
-    <div class="w-[35%]">
-        <h1 class="text-5xl font-bold mb-4 judson-bold">{titre}</h1>
+<div class={`mt-16 sm:mt-20 lg:mt-28 flex flex-col sm:flex-row sm:items-start justify-between gap-4 sm:gap-6 mb-5 ${readmoreactive ? "border-b-5 border-gray-900 pb-7" : ''}`}>
+    <div class="w-full sm:w-[35%]">
+        <h1 class="text-4xl sm:text-4xl md:text-5xl font-bold mb-0 judson-bold">{titre}</h1>
     </div>
-    <div class="w-[50%]">
-        <p class="text-xl text-gray-600  mt-2">{subtitle}</p>
+    <div class="w-full sm:w-[50%]">
+        <p class="text-base sm:text-lg md:text-xl text-gray-600 mt-2">{subtitle}</p>
         {
             readmoreactive && (<a href={url} class="flex gap-4 items-center hover:underline mt-4 text-lg font-bold text-gray-700">
             <div class="flex items-center justify-center w-9 h-9 rounded-full bg-gray-600 hover:bg-gray-900 text-white">

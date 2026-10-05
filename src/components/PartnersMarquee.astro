@@ -1,0 +1,44 @@
+---
+import { api, mediaUrl } from "../lib/api";
+
+let associations: Awaited<ReturnType<typeof api.associations>> = [];
+try {
+	associations = await api.associations();
+} catch {
+	associations = [];
+}
+
+const logos = associations
+	.map((a) => ({ name: a.name, src: mediaUrl(a.logo) }))
+	.filter((l): l is { name: string; src: string } => !!l.src);
+---
+
+{
+	logos.length > 0 && (
+		<section class="bg-gray-100 py-20 overflow-hidden mt-18">
+			<div class="marquee-track flex w-max items-center gap-16">
+				{[...logos, ...logos].map((logo) => (
+					<img src={logo.src} alt={logo.name} class="partner-logo h-22 w-auto shrink-0" />
+				))}
+			</div>
+		</section>
+	)
+}
+
+<style>
+	.marquee-track {
+		animation: marquee 5s linear infinite;
+	}
+	.partner-logo {
+		filter: grayscale(100%) contrast(0.8) brightness(1.2);
+		opacity: 0.50;
+	}
+	@keyframes marquee {
+		from {
+			transform: translateX(0);
+		}
+		to {
+			transform: translateX(-50%);
+		}
+	}
+</style>

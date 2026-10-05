@@ -1,0 +1,102 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import Container from "../components/Container.astro";
+import HeroSection from "../components/HeroSection.astro";
+import Title from "../components/Title.astro";
+import ArticleItem_3 from "../components/ArticleItem_3.astro";
+import ArticlesItems from "../components/ArticlesItems.astro";
+import JoinCta from "../components/JoinCta.astro";
+import { api, mediaUrl } from "../lib/api";
+
+let articles: Awaited<ReturnType<typeof api.news>> = [];
+try {
+	const all = await api.news();
+	articles = all
+		.filter((n) => n.published)
+		.sort((a, b) => {
+			const dateA = a.published_at ?? a.created_at;
+			const dateB = b.published_at ?? b.created_at;
+			return new Date(dateB).getTime() - new Date(dateA).getTime();
+		});
+} catch {
+	articles = [];
+}
+---
+
+<!doctype html>
+<html lang="fr">
+	<head>
+		<BaseHead
+			title="Actualités"
+			description="Suivez les dernières actualités et avancées autour de l'autisme au Cameroun."
+		/>
+	</head>
+	<body>
+		<Header />
+
+		<HeroSection
+			title="Actualités"
+			subtitle1="Suivez les dernières nouvelles, initiatives et avancées autour de l'autisme au Cameroun."
+			subtitle2=""
+			height="70vh"
+		/>
+
+		<section>
+			<Container>
+				<Title
+					title='Nos derniers articles'
+					subtitle="Retrouvez les publications de nos experts et associations partenaires."
+				/>
+				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-16 mb-24">
+					{
+						articles.length > 0 ? (
+							articles.map((article) => (
+								<ArticleItem_3
+									title={article.title}
+									subtitle={article.excerpt ?? undefined}
+									imageSrc={mediaUrl(article.cover_image)}
+									imageAlt={article.title}
+									category={article.category ?? undefined}
+									date={
+										article.published_at
+											? new Date(article.published_at).toLocaleDateString("fr-FR", {
+													year: "numeric",
+													month: "long",
+													day: "numeric",
+												})
+											: undefined
+									}
+									url={`/blog/${article.slug ?? article.id}`}
+								/>
+							))
+						) : (
+							<p class="col-span-full text-center text-gray-500 lato-regular">
+								Aucun article à afficher pour le moment.
+							</p>
+						)
+					}
+				</div>
+				<div class='grid grid-cols-2 gap-12 mt-20 mb-40'>
+					<ArticlesItems
+						title='Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+					/>
+					<ArticlesItems
+						title='Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+					/>
+					<ArticlesItems
+						title='Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+					/>
+					<ArticlesItems
+						title='Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+					/>
+				</div>
+			</Container>
+		</section>
+
+		<JoinCta />
+
+		<Footer />
+	</body>
+</html>
