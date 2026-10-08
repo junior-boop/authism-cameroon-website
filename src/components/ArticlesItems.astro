@@ -1,11 +1,10 @@
 ---
-import { Image } from "astro:assets";
 import imageTemplate from "../assets/blog-placeholder-3.jpg";
 
 interface Props {
     title?: string;
     subtitle?: string;
-    imageSrc?: string;
+    imageSrc?: string | null;
     imageAlt?: string;
     url?: string;
 }
@@ -19,7 +18,7 @@ const subtitle =
 const subtitle_substring =
     subtitle.length > 68 ? subtitle.substring(0, 69) + "..." : subtitle;
 
-const imageSrc = Astro.props.imageSrc || imageTemplate;
+const imageSrc = Astro.props.imageSrc || imageTemplate.src;
 const imageAlt = Astro.props.imageAlt || "images";
 
 const url = Astro.props.url || "/";
@@ -33,7 +32,7 @@ const url = Astro.props.url || "/";
         <span class='text-lg line-height'>{subtitle_substring}</span>
     </a>
     <a class='images' href={url}>
-        <Image src={imageSrc as string} alt={imageAlt} />
+        <img src={imageSrc} alt={imageAlt} />
     </a>
 </div>
 

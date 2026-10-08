@@ -10,14 +10,17 @@ type Props = {
   token: string;
   currentKey?: string | null;
   defaultFolder?: string;
+  portrait?: boolean;
 };
 
-export default function MediaField({ label, name, token, currentKey, defaultFolder }: Props) {
+export default function MediaField({ label, name, token, currentKey, defaultFolder, portrait }: Props) {
   const [selectedKey, setSelectedKey] = useState<string | null>(currentKey ?? null);
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const url = mediaUrl(selectedKey);
   const isImage = selectedKey ? IMAGE_EXTS.test(selectedKey) : false;
+  const previewCls = portrait ? "w-14 h-20 object-cover rounded shrink-0" : "w-12 h-12 object-cover rounded shrink-0";
+  const placeholderCls = portrait ? "w-14 h-20 bg-gray-200 rounded flex items-center justify-center shrink-0" : "w-12 h-12 bg-gray-200 rounded flex items-center justify-center shrink-0";
 
   return (
     <div className="flex flex-col gap-1">
@@ -26,9 +29,9 @@ export default function MediaField({ label, name, token, currentKey, defaultFold
         {selectedKey ? (
           <>
             {isImage && url ? (
-              <img src={url} alt="" className="w-12 h-12 object-cover rounded shrink-0" />
+              <img src={url} alt="" className={previewCls} />
             ) : (
-              <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center shrink-0">
+              <div className={placeholderCls}>
                 <svg className="w-6 h-6 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                 </svg>

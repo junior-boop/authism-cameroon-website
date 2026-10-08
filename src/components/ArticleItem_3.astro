@@ -29,9 +29,9 @@ const urlTitle = Astro.props.urlTitle || "Voir l'article";
 
 <div class='group flex flex-col aspect-2/3 gap-3 items-start bg-gray-100'>
     <a class='images' href={url}>
-        <img src={imageSrc as string} alt={imageAlt} class = "scale-100 group-hover:scale-110 transition-transform duration-500" />
+        <img src={imageSrc as string} alt={imageAlt} class = "scale-110 group-hover:scale-100 transition-transform duration-500" />
     </a>
-    <div class='flex flex-1 px-6 pb-6 h-[250px]'>
+    <div class='flex flex-1 px-6 pb-6 h-62.5'>
         <a
             href={url}
             class='flex flex-1 flex-col mt-4 justify-between w-full'>

@@ -15,6 +15,14 @@ function initial(name?: string | null) {
   return (name?.trim()?.[0] ?? "A").toUpperCase();
 }
 
+const CATEGORIES = [
+  { value: "conseil", label: "Conseil" },
+  { value: "association", label: "Association" },
+  { value: "article", label: "Article" },
+  { value: "temoignage", label: "Témoignage" },
+];
+const CATEGORY_LABEL: Record<string, string> = Object.fromEntries(CATEGORIES.map((c) => [c.value, c.label]));
+
 function NewsCard({
   item,
   onEdit,
@@ -53,6 +61,16 @@ function NewsCard({
           </div>
         </div>
         <div className="flex items-center gap-1 shrink-0">
+          {item.priority === 2 && (
+            <span className="bg-[#FF5656]/10 text-[#FF5656] text-xs font-semibold px-2.5 py-1 rounded-full">
+              Très important
+            </span>
+          )}
+          {item.priority === 1 && (
+            <span className="bg-amber-50 text-amber-700 text-xs font-semibold px-2.5 py-1 rounded-full">
+              Important
+            </span>
+          )}
           {item.published ? (
             <span className="bg-emerald-50 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full">
               Publié
@@ -117,7 +135,7 @@ function NewsCard({
       <div className="flex flex-wrap gap-1.5">
         {item.category && (
           <span className="border border-gray-200 text-gray-600 text-xs font-medium px-2.5 py-1 rounded-full">
-            {item.category}
+            {CATEGORY_LABEL[item.category] ?? item.category}
           </span>
         )}
       </div>
@@ -162,6 +180,7 @@ export default function AdminNews({ token }: { token: string }) {
   const [modal, setModal] = useState<{ open: boolean; item?: News }>({ open: false });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [category, setCategory] = useState("article");
 
   const reload = () =>
     api.news().then(setItems).catch(() => setError("Erreur de chargement")).finally(() => setLoading(false));
@@ -170,6 +189,10 @@ export default function AdminNews({ token }: { token: string }) {
     reload();
     adminApi(token).users.list().then(setUsers).catch(() => {});
   }, [token]);
+
+  useEffect(() => {
+    if (modal.open) setCategory(modal.item?.category ?? "article");
+  }, [modal.open, modal.item]);
 
   async function handleSave(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -277,8 +300,52 @@ export default function AdminNews({ token }: { token: string }) {
                   )}
                 </select>
               </label>
-              <Field label="Catégorie" name="category" defaultValue={modal.item?.category ?? ""} />
+              <label className="flex flex-col gap-1 text-sm text-gray-700">
+                Catégorie
+                <select
+                  name="category"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#00bcd4] bg-white"
+                >
+                  {CATEGORIES.map((c) => (
+                    <option key={c.value} value={c.value}>{c.label}</option>
+                  ))}
+                  {modal.item?.category && !CATEGORIES.some((c) => c.value === modal.item?.category) && (
+                    <option value={modal.item.category}>{modal.item.category} (ancien)</option>
+                  )}
+                </select>
+              </label>
+              {category === "conseil" && (
+                <MediaField
+                  label="Photo du spécialiste (portrait, visage uniquement)"
+                  name="specialist_image"
+                  token={token}
+                  currentKey={modal.item?.specialist_image}
+                  defaultFolder="experts"
+                  portrait
+                />
+              )}
               <Field label="Date de publication" name="published_at" type="date" defaultValue={modal.item?.published_at?.slice(0, 10) ?? ""} />
+              <label className="flex flex-col gap-1 text-sm text-gray-700">
+                Niveau d'importance
+                <select
+                  name="priority"
+                  defaultValue={String(modal.item?.priority ?? 0)}
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#00bcd4] bg-white"
+                >
+                  <option value="0">Normal</option>
+                  <option value="1">Moyennement important</option>
+                  <option value="2">Très important (un seul à la fois)</option>
+                </select>
+              </label>
+              <Field
+                label="Citation (affichée en mise en avant pour les articles « Très important »)"
+                name="quote"
+                textarea
+                rows={2}
+                defaultValue={modal.item?.quote ?? ""}
+              />
               <label className="flex items-center gap-2 text-sm text-gray-700">
                 <input type="checkbox" name="published" value="true" defaultChecked={!!modal.item?.published} />
                 Publié

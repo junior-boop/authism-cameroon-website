@@ -9,6 +9,8 @@ import ArticleItem_3 from "../components/ArticleItem_3.astro";
 import ArticlesItems from "../components/ArticlesItems.astro";
 import JoinCta from "../components/JoinCta.astro";
 import { api, mediaUrl } from "../lib/api";
+import export_1 from "../assets/expert_1.jpg";
+import Quotespace from "../components/Quotespace.astro";
 
 let articles: Awaited<ReturnType<typeof api.news>> = [];
 try {
@@ -16,6 +18,7 @@ try {
 	articles = all
 		.filter((n) => n.published)
 		.sort((a, b) => {
+			if (a.priority !== b.priority) return b.priority - a.priority;
 			const dateA = a.published_at ?? a.created_at;
 			const dateB = b.published_at ?? b.created_at;
 			return new Date(dateB).getTime() - new Date(dateA).getTime();
@@ -23,6 +26,12 @@ try {
 } catch {
 	articles = [];
 }
+
+// Hiérarchie éditoriale pilotée depuis l'admin (champ "priority" de l'actualité) :
+// 2 = article à la une, 1 = moyennement important, 0 = reste des articles.
+const heroArticle = articles.find((a) => a.priority === 2) ?? null;
+const moderateArticles = articles.filter((a) => a.priority === 1);
+const restArticles = articles.filter((a) => a.priority === 0);
 ---
 
 <!doctype html>
@@ -45,29 +54,54 @@ try {
 
 		<section>
 			<Container>
-				<Title
-					title='Nos derniers articles'
-					subtitle="Retrouvez les publications de nos experts et associations partenaires."
-				/>
-				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-16 mb-24">
-					{
-						articles.length > 0 ? (
-							articles.map((article) => (
+				{moderateArticles.length > 0 && (
+					<>
+						<Title
+							title='Nos derniers articles'
+							subtitle="Retrouvez les publications de nos experts et associations partenaires."
+						/>
+						<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-16 mb-24">
+							{moderateArticles.map((article) => (
 								<ArticleItem_3
 									title={article.title}
 									subtitle={article.excerpt ?? undefined}
 									imageSrc={mediaUrl(article.cover_image)}
 									imageAlt={article.title}
 									category={article.category ?? undefined}
-									date={
-										article.published_at
-											? new Date(article.published_at).toLocaleDateString("fr-FR", {
-													year: "numeric",
-													month: "long",
-													day: "numeric",
-												})
-											: undefined
-									}
+									url={`/blog/${article.slug ?? article.id}`}
+								/>
+							))}
+						</div>
+					</>
+				)}
+
+				{heroArticle && (
+					<div class="mt-16 mb-24">
+						<Quotespace
+							src={mediaUrl(heroArticle.cover_image) ?? export_1.src}
+							alt={heroArticle.title}
+							url={`/blog/${heroArticle.slug ?? heroArticle.id}`}
+							urlText="Lire l'article complet"
+							quote={heroArticle.title}
+							author={heroArticle.author ?? "Équipe éditoriale"}
+							role={heroArticle.category ?? "Article à la une"}
+						/>
+					</div>
+				)}
+
+				<Title
+					title='Tous les articles'
+					subtitle=" "
+				/>
+				<div class='grid grid-cols-1 sm:grid-cols-2 gap-12 mt-20 mb-40'>
+					{
+						restArticles.length > 0 ? (
+							restArticles.map((article) => (
+								<ArticlesItems
+									title={article.title}
+									subtitle={article.excerpt ?? undefined}
+									imageSrc={mediaUrl(article.cover_image)}
+									imageAlt={article.title}
 									url={`/blog/${article.slug ?? article.id}`}
 								/>
 							))
@@ -77,20 +111,6 @@ try {
 							</p>
 						)
 					}
-				</div>
-				<div class='grid grid-cols-2 gap-12 mt-20 mb-40'>
-					<ArticlesItems
-						title='Lorem ipsum dolor sit amet, consectetur adipiscing elit'
-					/>
-					<ArticlesItems
-						title='Lorem ipsum dolor sit amet, consectetur adipiscing elit'
-					/>
-					<ArticlesItems
-						title='Lorem ipsum dolor sit amet, consectetur adipiscing elit'
-					/>
-					<ArticlesItems
-						title='Lorem ipsum dolor sit amet, consectetur adipiscing elit'
-					/>
 				</div>
 			</Container>
 		</section>

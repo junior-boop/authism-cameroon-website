@@ -60,7 +60,7 @@ export default function AdminActivity({ token }: { token: string }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    adminApi(token).activity.list(30)
+    adminApi(token).activity.list(20)
       .then(setEntries)
       .finally(() => setLoading(false));
   }, []);

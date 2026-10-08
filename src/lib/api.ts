@@ -69,6 +69,9 @@ export type News = {
   category: string | null
   published: number
   published_at: string | null
+  priority: number
+  quote: string | null
+  specialist_image: string | null
   created_at: string
   updated_at: string
 }

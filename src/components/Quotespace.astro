@@ -5,12 +5,20 @@ interface Props {
     alt?: string;
     url?: string;
     urlText?: string;
+    quote?: string;
+    author?: string;
+    role?: string;
 }
 
 const imageSrc = Astro.props.src;
 const imageAlt = Astro.props.alt;
 const url = Astro.props.url || "#";
 const urlText = Astro.props.urlText || "Voir tous les conseils";
+const quote =
+    Astro.props.quote ||
+    "L'autisme en Afrique est un enjeu de santé publique majeur, marqué par une forte stigmatisation, un manque de diagnostics précoces et de structures spécialisées.";
+const author = Astro.props.author || "Dr. Jane Doe";
+const role = Astro.props.role || "Psychologue spécialisée dans l'autisme";
 ---
 
 <blockquote class="flex flex-col sm:flex-row gap-8 sm:gap-15 mt-16">
@@ -18,11 +26,11 @@ const urlText = Astro.props.urlText || "Voir tous les conseils";
         {imageSrc && <img src={imageSrc} alt={imageAlt} class="h-full w-full object-cover" />}
     </cite>
     <div class="sm:flex-1 sm:pt-16">
-        <div><span class="quote judson-regular text-3xl sm:text-4xl md:text-5xl relative">L'autisme en Afrique est un enjeu de santé publique majeur, marqué par une forte stigmatisation, un manque de diagnostics précoces et de structures spécialisées.</span></div>
+        <div><span class="quote judson-regular text-3xl sm:text-4xl md:text-5xl relative">{quote}</span></div>
         <div>
-            <h2 class="text-2xl font-bold judson-bold mt-9">Dr. Jane Doe</h2>
+            <h2 class="text-2xl font-bold judson-bold mt-9">{author}</h2>
             <p class="text-sm text-gray-700">
-                Psychologue spécialisée dans l'autisme
+                {role}
             </p>
             <a href={url} class="flex gap-4 items-center hover:underline mt-4 text-lg font-bold text-gray-700">
             <div class="flex items-center justify-center w-9 h-9 rounded-full bg-gray-600 hover:bg-gray-900 text-white">
